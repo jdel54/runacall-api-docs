@@ -145,82 +145,130 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-001"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "first_name": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "Jenny"
+            ]
           },
           "last_name": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "Rosen"
+            ]
           },
           "company_name": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Acme HVAC"
             ]
           },
           "email": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "jenny.rosen@example.com"
             ]
           },
           "phone": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "+15555550100"
             ]
           },
           "phone_alt": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "+15555550101"
             ]
           },
           "billing_address_line_1": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "510 Townsend St"
             ]
           },
           "billing_address_line_2": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Suite 200"
             ]
           },
           "billing_city": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "San Francisco"
             ]
           },
           "billing_state": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "CA"
             ]
           },
           "billing_zip": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "94103"
             ]
           },
           "source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "google"
+            ]
           },
           "tags": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "examples": [
+              [
+                "vip",
+                "commercial"
+              ]
+            ]
           },
           "created_at": {
             "type": "string",
@@ -371,12 +419,18 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-job-2026-1042"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "customer_id": {
@@ -402,21 +456,36 @@
             "format": "uuid"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "scheduled"
+            ]
           },
           "priority": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "scheduled"
+            ]
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "service"
+            ]
           },
           "source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "call"
+            ]
           },
           "scheduled_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-05-20"
             ]
           },
           "scheduled_start": {
@@ -458,18 +527,27 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "AC not cooling — possibly low refrigerant. Customer says it ran fine yesterday."
             ]
           },
           "diagnosis": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "R-410A leak at evaporator coil. ~0.5 lb low."
             ]
           },
           "work_performed": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Replaced evaporator coil. Recharged refrigerant to spec. Pressure-tested."
             ]
           },
           "parent_job_id": {
@@ -695,12 +773,18 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-est-001"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "customer_id": {
@@ -719,12 +803,18 @@
             "format": "uuid"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "sent"
+            ]
           },
           "valid_until": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-06-13"
             ]
           },
           "customer_approved_at": {
@@ -738,6 +828,9 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "AC replacement + new smart thermostat install. Includes 10-year parts warranty."
             ]
           },
           "converted_job_id": {
@@ -891,12 +984,18 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-inv-001"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "customer_id": {
@@ -911,27 +1010,48 @@
             "format": "uuid"
           },
           "invoice_number": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "INV-2026-1042"
+            ]
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "sent"
+            ]
           },
           "subtotal": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              450
+            ]
           },
           "tax_amount": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              36
+            ]
           },
           "tax_rate": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              0.08
+            ]
           },
           "total": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              486
+            ]
           },
           "due_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-06-12"
             ]
           },
           "sent_at": {
@@ -952,6 +1072,9 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Service call + evaporator coil replacement. Net 30."
             ]
           },
           "created_at": {
@@ -1103,18 +1226,30 @@
             "format": "uuid"
           },
           "amount": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              486
+            ]
           },
           "method": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "credit_card"
+            ]
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "succeeded"
+            ]
           },
           "stripe_payment_id": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "pi_3OqK4nJ8ZcU2bC0a1Y2eX3f"
             ]
           },
           "collected_at": {
@@ -1216,12 +1351,18 @@
                 "type": [
                   "string",
                   "null"
+                ],
+                "examples": [
+                  "Agent: Hi, thanks for calling Acme HVAC. How can I help today?\nCaller: My AC isn't cooling. Can someone come out?\nAgent: I can schedule a tech for tomorrow morning. Does 9am work?\nCaller: Yes, that's perfect.\nAgent: Booked. You'll get a confirmation text shortly."
                 ]
               },
               "recording_url": {
                 "type": [
                   "string",
                   "null"
+                ],
+                "examples": [
+                  "https://storage.runacall.com/voice-recordings/{org}/{call_id}.mp3"
                 ]
               }
             },
@@ -1247,21 +1388,36 @@
             "format": "uuid"
           },
           "call_direction": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "inbound"
+            ]
           },
           "call_status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "completed"
+            ]
           },
           "from_number": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "+15555550100"
+            ]
           },
           "to_number": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "+15555550199"
+            ]
           },
           "duration_seconds": {
             "type": [
               "number",
               "null"
+            ],
+            "examples": [
+              247
             ]
           },
           "is_spam": {
@@ -1274,28 +1430,43 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Customer reporting AC not cooling. Requested same-day service. Confirmed appointment for tomorrow 9am."
             ]
           },
           "user_sentiment": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "positive"
             ]
           },
           "call_intent": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "service_request"
             ]
           },
           "urgency_level": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "routine"
             ]
           },
           "triage_status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "new"
+            ]
           },
           "created_at": {
             "type": "string",
@@ -1526,12 +1697,18 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-mship-001"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "customer_id": {
@@ -1543,30 +1720,48 @@
             "format": "uuid"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "active"
+            ]
           },
           "billing_cycle": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "monthly"
+            ]
           },
           "start_date": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "2026-01-15"
+            ]
           },
           "end_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2027-01-15"
             ]
           },
           "next_billing_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-06-15"
             ]
           },
           "next_maintenance_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-09-15"
             ]
           },
           "cancelled_at": {
@@ -1580,6 +1775,9 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Customer moved out of service area."
             ]
           },
           "suspended_at": {
@@ -1774,11 +1972,17 @@
                 ]
               },
               "message": {
-                "type": "string"
+                "type": "string",
+                "examples": [
+                  "Missing or malformed Authorization header. Expected: Authorization: Bearer rkc_live_..."
+                ]
               },
               "doc_url": {
                 "type": "string",
-                "format": "uri"
+                "format": "uri",
+                "examples": [
+                  "https://docs.runacall.com/api#errors-unauthorized"
+                ]
               },
               "request_id": {
                 "type": "string",
@@ -1830,28 +2034,43 @@
         "properties": {
           "external_id": {
             "type": "string",
-            "description": "Integrator's own identifier. When paired with `external_source`, POSTing the same value twice upserts the existing row (200) instead of creating a duplicate (201)."
+            "description": "Integrator's own identifier. When paired with `external_source`, POSTing the same value twice upserts the existing row (200) instead of creating a duplicate (201).",
+            "examples": [
+              "crm-acme-001"
+            ]
           },
           "external_source": {
             "type": "string",
-            "description": "Namespace for `external_id` (e.g. 'servicetitan'). Required when `external_id` is provided."
+            "description": "Namespace for `external_id` (e.g. 'servicetitan'). Required when `external_id` is provided.",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "first_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "Jenny"
+            ]
           },
           "last_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "Rosen"
+            ]
           },
           "company_name": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "Acme HVAC"
+            ]
           },
           "email": {
             "type": [
@@ -1859,56 +2078,80 @@
               "null"
             ],
             "maxLength": 254,
-            "format": "email"
+            "format": "email",
+            "examples": [
+              "jenny.rosen@example.com"
+            ]
           },
           "phone": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 30
+            "maxLength": 30,
+            "examples": [
+              "+15555550100"
+            ]
           },
           "phone_alt": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 30
+            "maxLength": 30,
+            "examples": [
+              "+15555550101"
+            ]
           },
           "billing_address_line_1": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "510 Townsend St"
+            ]
           },
           "billing_address_line_2": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "Suite 200"
+            ]
           },
           "billing_city": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "San Francisco"
+            ]
           },
           "billing_state": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "examples": [
+              "CA"
+            ]
           },
           "billing_zip": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 20
+            "maxLength": 20,
+            "examples": [
+              "94103"
+            ]
           },
           "source": {
             "type": "string",
@@ -1926,7 +2169,13 @@
               "type": "string",
               "maxLength": 50
             },
-            "maxItems": 20
+            "maxItems": 20,
+            "examples": [
+              [
+                "vip",
+                "commercial"
+              ]
+            ]
           }
         },
         "required": [
@@ -1940,19 +2189,28 @@
           "first_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "Jenny"
+            ]
           },
           "last_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "Rosen"
+            ]
           },
           "company_name": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "Acme HVAC"
+            ]
           },
           "email": {
             "type": [
@@ -1960,56 +2218,80 @@
               "null"
             ],
             "maxLength": 254,
-            "format": "email"
+            "format": "email",
+            "examples": [
+              "jenny.rosen@example.com"
+            ]
           },
           "phone": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 30
+            "maxLength": 30,
+            "examples": [
+              "+15555550100"
+            ]
           },
           "phone_alt": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 30
+            "maxLength": 30,
+            "examples": [
+              "+15555550101"
+            ]
           },
           "billing_address_line_1": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "510 Townsend St"
+            ]
           },
           "billing_address_line_2": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "Suite 200"
+            ]
           },
           "billing_city": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "San Francisco"
+            ]
           },
           "billing_state": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "examples": [
+              "CA"
+            ]
           },
           "billing_zip": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 20
+            "maxLength": 20,
+            "examples": [
+              "94103"
+            ]
           },
           "source": {
             "type": "string",
@@ -2027,7 +2309,13 @@
               "type": "string",
               "maxLength": 50
             },
-            "maxItems": 20
+            "maxItems": 20,
+            "examples": [
+              [
+                "vip",
+                "commercial"
+              ]
+            ]
           }
         },
         "description": "Partial update. `external_id` / `external_source` cannot be changed via PATCH (re-POST with a new pair instead). Unknown keys return 422."
@@ -2072,12 +2360,18 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-001-prop1"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "customer_id": {
@@ -2085,42 +2379,69 @@
             "format": "uuid"
           },
           "address_line_1": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "510 Townsend St"
+            ]
           },
           "address_line_2": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Suite 200"
             ]
           },
           "city": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "San Francisco"
+            ]
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "CA"
+            ]
           },
           "zip": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "94103"
+            ]
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "residential"
+            ]
           },
           "access_notes": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Gate code: 4321. Dog in backyard."
             ]
           },
           "lat": {
             "type": [
               "number",
               "null"
+            ],
+            "examples": [
+              37.7793
             ]
           },
           "lng": {
             "type": [
               "number",
               "null"
+            ],
+            "examples": [
+              -122.4192
             ]
           },
           "created_at": {
@@ -2165,10 +2486,16 @@
         "type": "object",
         "properties": {
           "external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001-prop1"
+            ]
           },
           "external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "customer_id": {
             "type": "string",
@@ -2176,37 +2503,58 @@
             "description": "Customer UUID. Provide this OR `customer_external_id` + `customer_external_source`."
           },
           "customer_external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001"
+            ]
           },
           "customer_external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "address_line_1": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "510 Townsend St"
+            ]
           },
           "address_line_2": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "Suite 200"
+            ]
           },
           "city": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "San Francisco"
+            ]
           },
           "state": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50
+            "maxLength": 50,
+            "examples": [
+              "CA"
+            ]
           },
           "zip": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 20
+            "maxLength": 20,
+            "examples": [
+              "94103"
+            ]
           },
           "type": {
             "type": "string",
@@ -2220,7 +2568,10 @@
               "string",
               "null"
             ],
-            "maxLength": 2000
+            "maxLength": 2000,
+            "examples": [
+              "Gate code: 4321. Dog in backyard."
+            ]
           },
           "lat": {
             "type": [
@@ -2228,7 +2579,10 @@
               "null"
             ],
             "minimum": -90,
-            "maximum": 90
+            "maximum": 90,
+            "examples": [
+              37.7793
+            ]
           },
           "lng": {
             "type": [
@@ -2236,7 +2590,10 @@
               "null"
             ],
             "minimum": -180,
-            "maximum": 180
+            "maximum": 180,
+            "examples": [
+              -122.4192
+            ]
           }
         },
         "required": [
@@ -2252,29 +2609,44 @@
           "address_line_1": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "510 Townsend St"
+            ]
           },
           "address_line_2": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "examples": [
+              "Suite 200"
+            ]
           },
           "city": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "San Francisco"
+            ]
           },
           "state": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50
+            "maxLength": 50,
+            "examples": [
+              "CA"
+            ]
           },
           "zip": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 20
+            "maxLength": 20,
+            "examples": [
+              "94103"
+            ]
           },
           "type": {
             "type": "string",
@@ -2288,7 +2660,10 @@
               "string",
               "null"
             ],
-            "maxLength": 2000
+            "maxLength": 2000,
+            "examples": [
+              "Gate code: 4321. Dog in backyard."
+            ]
           },
           "lat": {
             "type": [
@@ -2296,7 +2671,10 @@
               "null"
             ],
             "minimum": -90,
-            "maximum": 90
+            "maximum": 90,
+            "examples": [
+              37.7793
+            ]
           },
           "lng": {
             "type": [
@@ -2304,7 +2682,10 @@
               "null"
             ],
             "minimum": -180,
-            "maximum": 180
+            "maximum": 180,
+            "examples": [
+              -122.4192
+            ]
           }
         }
       },
@@ -2348,12 +2729,18 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "crm-acme-001-eq1"
             ]
           },
           "external_source": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "servicetitan"
             ]
           },
           "property_id": {
@@ -2361,51 +2748,78 @@
             "format": "uuid"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "ac"
+            ]
           },
           "manufacturer": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "Carrier"
             ]
           },
           "model": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "24ABC636A003"
             ]
           },
           "serial_number": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "3618E12345"
             ]
           },
           "install_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2018-06-15"
             ]
           },
           "warranty_expiry": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2028-06-15"
             ]
           },
           "condition": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "good"
+            ]
           },
           "notes": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "3-ton split system, R-410A refrigerant."
             ]
           },
           "data_plate_photo_url": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "https://storage.runacall.com/eq-photos/{org}/3618E12345.jpg"
             ]
           },
           "created_at": {
@@ -2465,10 +2879,16 @@
         "type": "object",
         "properties": {
           "external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001-eq1"
+            ]
           },
           "external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "property_id": {
             "type": "string",
@@ -2476,10 +2896,16 @@
             "description": "Property UUID. Provide this OR `property_external_id` + `property_external_source`."
           },
           "property_external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001-prop1"
+            ]
           },
           "property_external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "type": {
             "type": "string",
@@ -2500,32 +2926,47 @@
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "Carrier"
+            ]
           },
           "model": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "24ABC636A003"
+            ]
           },
           "serial_number": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "3618E12345"
+            ]
           },
           "install_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2018-06-15"
             ]
           },
           "warranty_expiry": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2028-06-15"
             ]
           },
           "condition": {
@@ -2542,14 +2983,20 @@
               "string",
               "null"
             ],
-            "maxLength": 5000
+            "maxLength": 5000,
+            "examples": [
+              "3-ton split system, R-410A refrigerant."
+            ]
           },
           "data_plate_photo_url": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 2048
+            "maxLength": 2048,
+            "examples": [
+              "https://storage.runacall.com/eq-photos/{org}/3618E12345.jpg"
+            ]
           }
         },
         "required": [
@@ -2578,32 +3025,47 @@
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "Carrier"
+            ]
           },
           "model": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "24ABC636A003"
+            ]
           },
           "serial_number": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "examples": [
+              "3618E12345"
+            ]
           },
           "install_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2018-06-15"
             ]
           },
           "warranty_expiry": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2028-06-15"
             ]
           },
           "condition": {
@@ -2620,14 +3082,20 @@
               "string",
               "null"
             ],
-            "maxLength": 5000
+            "maxLength": 5000,
+            "examples": [
+              "3-ton split system, R-410A refrigerant."
+            ]
           },
           "data_plate_photo_url": {
             "type": [
               "string",
               "null"
             ],
-            "maxLength": 2048
+            "maxLength": 2048,
+            "examples": [
+              "https://storage.runacall.com/eq-photos/{org}/3618E12345.jpg"
+            ]
           }
         }
       },
@@ -2675,40 +3143,64 @@
         "type": "object",
         "properties": {
           "external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-job-2026-1042"
+            ]
           },
           "external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "customer_id": {
             "type": "string",
             "format": "uuid"
           },
           "customer_external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001"
+            ]
           },
           "customer_external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "property_id": {
             "type": "string",
             "format": "uuid"
           },
           "property_external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001-prop1"
+            ]
           },
           "property_external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "equipment_id": {
             "type": "string",
             "format": "uuid"
           },
           "equipment_external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001-eq1"
+            ]
           },
           "equipment_external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "status": {
             "type": "string",
@@ -2757,18 +3249,27 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-05-20"
             ]
           },
           "scheduled_start": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-05-20T16:00:00Z"
             ]
           },
           "scheduled_end": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-05-20T18:00:00Z"
             ]
           },
           "problem_description": {
@@ -2776,7 +3277,10 @@
               "string",
               "null"
             ],
-            "maxLength": 5000
+            "maxLength": 5000,
+            "examples": [
+              "AC not cooling — possibly low refrigerant."
+            ]
           }
         },
         "description": "Required FKs (customer, property) can be supplied as UUID OR as `{name}_external_id` + `{name}_external_source`. Equipment is optional, same dual form. PATCH on jobs is status-only."
@@ -2848,20 +3352,32 @@
         "type": "object",
         "properties": {
           "external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-mship-001"
+            ]
           },
           "external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "customer_id": {
             "type": "string",
             "format": "uuid"
           },
           "customer_external_id": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "crm-acme-001"
+            ]
           },
           "customer_external_source": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "service_agreement_id": {
             "type": "string",
@@ -2888,24 +3404,36 @@
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-01-15"
             ]
           },
           "end_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2027-01-15"
             ]
           },
           "next_billing_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-06-15"
             ]
           },
           "next_maintenance_date": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "2026-09-15"
             ]
           }
         },
@@ -3132,22 +3660,37 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "Diagnostic Service Call"
+            ]
           },
           "description": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "1-hour HVAC system diagnostic. Includes written estimate."
             ]
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "service"
+            ]
           },
           "unit_price": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              89
+            ]
           },
           "unit_cost": {
-            "type": "number"
+            "type": "number",
+            "examples": [
+              25
+            ]
           },
           "is_taxable": {
             "type": "boolean"
@@ -3237,27 +3780,48 @@
             "format": "uuid"
           },
           "channel": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "sms"
+            ]
           },
           "direction": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "outbound"
+            ]
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "on_my_way"
+            ]
           },
           "recipient": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "+15555550100"
+            ]
           },
           "message_body": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "Hi Jenny, this is Acme HVAC. Your tech is on the way — ETA 9:15am."
+            ]
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "examples": [
+              "delivered"
+            ]
           },
           "twilio_message_sid": {
             "type": [
               "string",
               "null"
+            ],
+            "examples": [
+              "SM3a8f7e6d5c4b3a2918e7f6d5c4b3a291"
             ]
           },
           "sent_at": {
