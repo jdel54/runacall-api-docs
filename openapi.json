@@ -3,7 +3,7 @@
   "info": {
     "title": "Run a Call External API",
     "version": "1.0.0",
-    "description": "Bearer-authenticated REST API for pushing data into and pulling data out of Run a Call.\n\nAll endpoints are scoped to the organization that owns the bearer token. Tenant isolation is enforced server-side; cross-org reads return 404 (not 403) to mask existence.\n\nRate limits: 60 req/min sustained per key (override-able by founders), 120/10s burst, 300/min per org, 5 concurrent in-flight per key. Exceeding any layer returns 429 with a `Retry-After` header.\n\nEvery request carries an `X-Request-Id` header. Quote it when reaching out for support.",
+    "description": "A bearer-authenticated REST API for pushing data into and pulling data out of **[Run a Call](https://runacall.com)** — the field service platform built for small-to-mid HVAC companies.\n\nUse it to migrate from your old CRM, sync data with accounting tools, fire Zapier / Make / n8n flows on real-time events, or wire your own custom scripts. Same surface internally — no second-class endpoints.\n\n## Quick start\n\n```bash\ncurl https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\"\n```\n\nGenerate a key from **[Settings → Integrations → API](https://app.runacall.com/settings/integrations/api)**. The token is shown once at creation — store it in a secret manager.\n\n## Authentication\n\nEvery request needs an `Authorization: Bearer rkc_live_...` header.\n\n| Scope | Grants |\n|---|---|\n| `read` | All `GET` endpoints |\n| `write` | `POST` and `PATCH` on customers / properties / equipment / jobs / memberships |\n\nKeys are SHA-256 hashed at rest. The raw token is shown to the org owner exactly once at creation; we cannot retrieve it later.\n\n## Tenant isolation\n\nEvery request is scoped to the organization that owns the bearer token. Cross-org reads return **404 (not 403)** to mask existence. There's no admin scope and no DELETE endpoints anywhere — soft-delete remains a UI-only operation.\n\n## Rate limits\n\n| Layer | Limit | Window |\n|---|---|---|\n| Per key — sustained | 60 req | 1 min rolling |\n| Per key — burst | 120 req | 10 s rolling |\n| Per org — all keys combined | 300 req | 1 min rolling |\n| Concurrent in-flight | 5 | — |\n\nExceeding any layer returns **429** with a `Retry-After` header. Founders can raise a known integrator's limit via per-key override — email **admin@runacall.com**.\n\n## Idempotency: upsert by external_id\n\nEvery writable resource (customers, properties, equipment, jobs, memberships) accepts `external_id` + `external_source`. POSTing the same pair twice **upserts** the existing row (returns 200 with the same id) instead of creating a duplicate (201). Safe to retry, safe to script bulk imports against.\n\n## Pagination\n\nCursor-based, never offset. Pass back the `next_cursor` from a response as `?starting_after=<cursor>` to fetch the next page.\n\n```json\n{\n  \"data\": [ /* up to 100 items */ ],\n  \"has_more\": true,\n  \"next_cursor\": \"MjAyNi0wNS0wN1QwODo1OTowMi4xMjIzNDQrMDA6MDB8MzZhNTlmMDQ\"\n}\n```\n\nDefault page size 50, hard cap 100.\n\n## Errors\n\nEvery error is the same envelope:\n\n```json\n{\n  \"error\": {\n    \"code\": \"invalid_request\",\n    \"message\": \"external_id is required when upserting\",\n    \"doc_url\": \"https://docs.runacall.com/#errors-invalid_request\",\n    \"request_id\": \"req_a93a7817f5a8485d80204becea\"\n  }\n}\n```\n\nQuote `request_id` when reaching out for support — it correlates to our audit log.\n\n| Code | Status | Meaning |\n|---|---|---|\n| `invalid_request` | 400 / 422 | Body or query validation failed |\n| `unauthorized` | 401 | Missing or invalid bearer token |\n| `forbidden` | 403 | Token lacks the required scope |\n| `not_found` | 404 | Resource doesn't exist (or belongs to another org) |\n| `conflict` | 409 | Concurrent upsert race lost — retry will hit the existing row |\n| `rate_limited` | 429 | Layer exceeded — see `Retry-After` |\n| `internal_error` | 500 | Bug on our end — quote the request_id |\n\n## Webhooks\n\nSubscribe a URL via **[Settings → Integrations → Webhooks](https://app.runacall.com/settings/integrations/webhooks)** to receive real-time events for customers, jobs, estimates, invoices, payments, voice calls, and memberships. Deliveries are **HMAC-SHA256 signed** over `\\${ts}.\\${raw_body}` with the signature in the `Run-A-Call-Signature` header. See the **Webhooks** section in the sidebar for the full event catalog + delivery contract.",
     "contact": {
       "name": "Run a Call Support",
       "email": "admin@runacall.com"
@@ -3970,7 +3970,7 @@
     "parameters": {}
   },
   "paths": {
-    "/api/v1/customers": {
+    "/customers": {
       "get": {
         "tags": [
           "Customers"
@@ -4243,7 +4243,7 @@
         }
       }
     },
-    "/api/v1/customers/{id}": {
+    "/customers/{id}": {
       "get": {
         "tags": [
           "Customers"
@@ -4495,7 +4495,7 @@
         }
       }
     },
-    "/api/v1/customers/lookup": {
+    "/customers/lookup": {
       "get": {
         "tags": [
           "Customers"
@@ -4630,7 +4630,7 @@
         }
       }
     },
-    "/api/v1/properties": {
+    "/properties": {
       "get": {
         "tags": [
           "Properties"
@@ -4910,7 +4910,7 @@
         }
       }
     },
-    "/api/v1/properties/{id}": {
+    "/properties/{id}": {
       "get": {
         "tags": [
           "Properties"
@@ -5162,7 +5162,7 @@
         }
       }
     },
-    "/api/v1/properties/lookup": {
+    "/properties/lookup": {
       "get": {
         "tags": [
           "Properties"
@@ -5279,7 +5279,7 @@
         }
       }
     },
-    "/api/v1/equipment": {
+    "/equipment": {
       "get": {
         "tags": [
           "Equipment"
@@ -5559,7 +5559,7 @@
         }
       }
     },
-    "/api/v1/equipment/{id}": {
+    "/equipment/{id}": {
       "get": {
         "tags": [
           "Equipment"
@@ -5811,7 +5811,7 @@
         }
       }
     },
-    "/api/v1/equipment/lookup": {
+    "/equipment/lookup": {
       "get": {
         "tags": [
           "Equipment"
@@ -5936,7 +5936,7 @@
         }
       }
     },
-    "/api/v1/jobs": {
+    "/jobs": {
       "get": {
         "tags": [
           "Jobs"
@@ -6244,7 +6244,7 @@
         }
       }
     },
-    "/api/v1/jobs/{id}": {
+    "/jobs/{id}": {
       "get": {
         "tags": [
           "Jobs"
@@ -6497,7 +6497,7 @@
         }
       }
     },
-    "/api/v1/memberships": {
+    "/memberships": {
       "get": {
         "tags": [
           "Memberships"
@@ -6782,7 +6782,7 @@
         }
       }
     },
-    "/api/v1/memberships/{id}": {
+    "/memberships/{id}": {
       "get": {
         "tags": [
           "Memberships"
@@ -7034,7 +7034,7 @@
         }
       }
     },
-    "/api/v1/memberships/lookup": {
+    "/memberships/lookup": {
       "get": {
         "tags": [
           "Memberships"
@@ -7151,7 +7151,7 @@
         }
       }
     },
-    "/api/v1/estimates": {
+    "/estimates": {
       "get": {
         "tags": [
           "Estimates"
@@ -7300,7 +7300,7 @@
         }
       }
     },
-    "/api/v1/estimates/{id}": {
+    "/estimates/{id}": {
       "get": {
         "tags": [
           "Estimates"
@@ -7412,7 +7412,7 @@
         }
       }
     },
-    "/api/v1/estimates/lookup": {
+    "/estimates/lookup": {
       "get": {
         "tags": [
           "Estimates"
@@ -7529,7 +7529,7 @@
         }
       }
     },
-    "/api/v1/invoices": {
+    "/invoices": {
       "get": {
         "tags": [
           "Invoices"
@@ -7704,7 +7704,7 @@
         }
       }
     },
-    "/api/v1/invoices/{id}": {
+    "/invoices/{id}": {
       "get": {
         "tags": [
           "Invoices"
@@ -7816,7 +7816,7 @@
         }
       }
     },
-    "/api/v1/invoices/lookup": {
+    "/invoices/lookup": {
       "get": {
         "tags": [
           "Invoices"
@@ -7933,7 +7933,7 @@
         }
       }
     },
-    "/api/v1/payments": {
+    "/payments": {
       "get": {
         "tags": [
           "Payments"
@@ -8103,7 +8103,7 @@
         }
       }
     },
-    "/api/v1/payments/{id}": {
+    "/payments/{id}": {
       "get": {
         "tags": [
           "Payments"
@@ -8215,7 +8215,7 @@
         }
       }
     },
-    "/api/v1/voice-calls": {
+    "/voice-calls": {
       "get": {
         "tags": [
           "Voice Calls"
@@ -8372,7 +8372,7 @@
         }
       }
     },
-    "/api/v1/voice-calls/{id}": {
+    "/voice-calls/{id}": {
       "get": {
         "tags": [
           "Voice Calls"
@@ -8485,7 +8485,7 @@
         }
       }
     },
-    "/api/v1/pricebook": {
+    "/pricebook": {
       "get": {
         "tags": [
           "Pricebook"
@@ -8644,7 +8644,7 @@
         }
       }
     },
-    "/api/v1/pricebook/{id}": {
+    "/pricebook/{id}": {
       "get": {
         "tags": [
           "Pricebook"
@@ -8756,7 +8756,7 @@
         }
       }
     },
-    "/api/v1/communications": {
+    "/communications": {
       "get": {
         "tags": [
           "Communications"
@@ -8945,7 +8945,7 @@
         }
       }
     },
-    "/api/v1/communications/{id}": {
+    "/communications/{id}": {
       "get": {
         "tags": [
           "Communications"
