@@ -7,6 +7,9 @@ Public documentation for the Run a Call External REST API. Hosted at
 
 - `openapi.json` — OpenAPI 3.1 spec, regenerated from the main repo's
   Zod schemas via `zod-to-openapi`.
+- `postman-collection.json` — Postman v2.1 collection generated from
+  the same spec via `openapi-to-postmanv2`. Linked from the top-right
+  of `index.html` as a one-click download.
 - `index.html` — Redoc CDN bundle. Renders `openapi.json` into a
   three-panel API reference + the webhooks section.
 - `CNAME` — GitHub Pages custom domain config (`docs.runacall.com`).
@@ -14,14 +17,16 @@ Public documentation for the Run a Call External REST API. Hosted at
 ## Updating the spec
 
 This repo holds a static snapshot of the API surface. The source of
-truth lives in the main app repo (`product-hvac`). To sync:
+truth lives in the main app repo (`product-hvac`). To sync both
+artifacts (OpenAPI + Postman):
 
 ```bash
 # in product-hvac:
-npm run gen:spec ../runacall-api-docs/openapi.json
+npm run gen:spec    ../runacall-api-docs/openapi.json
+npm run gen:postman ../runacall-api-docs/postman-collection.json
 
 # back here:
-git add openapi.json
+git add openapi.json postman-collection.json
 git commit -m "sync spec from product-hvac@<short-sha>"
 git push
 ```

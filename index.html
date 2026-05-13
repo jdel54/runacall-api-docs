@@ -23,9 +23,58 @@
         margin: 0;
         padding: 0;
       }
+      .docs-actions {
+        position: fixed;
+        top: 12px;
+        right: 16px;
+        z-index: 100;
+        display: flex;
+        gap: 8px;
+      }
+      .docs-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: #0f0f0f;
+        color: #fff;
+        font-family: Roboto, system-ui, sans-serif;
+        font-size: 12.5px;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background 120ms ease;
+      }
+      .docs-actions a:hover {
+        background: #2a2a2a;
+      }
+      .docs-actions a.secondary {
+        background: #fff;
+        color: #0f0f0f;
+        border: 1px solid #e5e5e5;
+      }
+      .docs-actions a.secondary:hover {
+        background: #f5f5f5;
+      }
+      @media (max-width: 720px) {
+        .docs-actions {
+          position: static;
+          padding: 12px 16px;
+          background: #fafafa;
+          border-bottom: 1px solid #e5e5e5;
+        }
+      }
     </style>
   </head>
   <body>
+    <div class="docs-actions">
+      <a href="openapi.json" download="runacall-openapi.json" class="secondary">
+        Download OpenAPI
+      </a>
+      <a href="postman-collection.json" download="runacall-api.postman_collection.json">
+        Import into Postman
+      </a>
+    </div>
     <redoc
       spec-url="./openapi.json"
       hide-loading
