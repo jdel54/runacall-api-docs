@@ -762,6 +762,57 @@
           "data"
         ]
       },
+      "EstimateOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tier": {
+            "type": "string",
+            "examples": [
+              "better"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "Better — 16 SEER AC + smart thermostat"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "Carrier Performance series, smart thermostat install, 10-year parts warranty."
+            ]
+          },
+          "total_price": {
+            "type": "number",
+            "examples": [
+              7850
+            ]
+          },
+          "is_selected": {
+            "type": "boolean"
+          },
+          "sort_order": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "tier",
+          "title",
+          "description",
+          "total_price",
+          "is_selected",
+          "sort_order"
+        ]
+      },
       "Estimate": {
         "type": "object",
         "properties": {
@@ -840,6 +891,30 @@
             ],
             "format": "uuid"
           },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Total of the selected option (`is_selected = true`). `null` when no option is selected yet.",
+            "examples": [
+              7850
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EstimateOption"
+            },
+            "description": "Good / Better / Best tiers sorted by `sort_order`. Empty array when the estimate has no options yet."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -861,6 +936,9 @@
           "customer_approved_at",
           "notes",
           "converted_job_id",
+          "currency",
+          "amount",
+          "options",
           "created_at",
           "updated_at"
         ]
@@ -1045,6 +1123,13 @@
               486
             ]
           },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
+            "examples": [
+              "USD"
+            ]
+          },
           "due_date": {
             "type": [
               "string",
@@ -1098,6 +1183,7 @@
           "tax_amount",
           "tax_rate",
           "total",
+          "currency",
           "due_date",
           "sent_at",
           "paid_at",
@@ -1231,6 +1317,13 @@
               486
             ]
           },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
+            "examples": [
+              "USD"
+            ]
+          },
           "method": {
             "type": "string",
             "examples": [
@@ -1276,6 +1369,7 @@
           "id",
           "invoice_id",
           "amount",
+          "currency",
           "method",
           "status",
           "stripe_payment_id",
@@ -3692,6 +3786,13 @@
               25
             ]
           },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
+            "examples": [
+              "USD"
+            ]
+          },
           "is_taxable": {
             "type": "boolean"
           },
@@ -3715,6 +3816,7 @@
           "type",
           "unit_price",
           "unit_cost",
+          "currency",
           "is_taxable",
           "is_active",
           "created_at",
@@ -3881,6 +3983,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/customers\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -4001,6 +4115,18 @@
             "bearerAuth": [
               "write"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/customers\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
           }
         ],
         "requestBody": {
@@ -4130,6 +4256,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/customers/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/customers/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -4226,6 +4364,18 @@
             "bearerAuth": [
               "write"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/customers/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/customers/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -4359,6 +4509,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/customers/lookup \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/customers/lookup\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -4479,6 +4641,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/properties \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/properties\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -4610,6 +4784,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/properties \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/properties\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4737,6 +4923,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/properties/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/properties/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -4833,6 +5031,18 @@
             "bearerAuth": [
               "write"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/properties/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/properties/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -4965,6 +5175,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/properties/lookup \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/properties/lookup\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -5068,6 +5290,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/equipment \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -5199,6 +5433,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/equipment \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5326,6 +5572,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/equipment/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -5422,6 +5680,18 @@
             "bearerAuth": [
               "write"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/equipment/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -5554,6 +5824,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/equipment/lookup \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment/lookup\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -5665,6 +5947,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/jobs \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -5824,6 +6118,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/jobs \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5951,6 +6257,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -6048,6 +6366,18 @@
             "bearerAuth": [
               "write"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -6178,6 +6508,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/memberships \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/memberships\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -6314,6 +6656,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/memberships \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/memberships\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -6441,6 +6795,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/memberships/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/memberships/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -6537,6 +6903,18 @@
             "bearerAuth": [
               "write"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/memberships/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/memberships/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -6669,6 +7047,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/memberships/lookup \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/memberships/lookup\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -6772,6 +7162,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/estimates \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/estimates\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -6911,6 +7313,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/estimates/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/estimates/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7009,6 +7423,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/estimates/lookup \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/estimates/lookup\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -7114,6 +7540,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/invoices \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/invoices\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -7279,6 +7717,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/invoices/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/invoices/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7377,6 +7827,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/invoices/lookup \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/invoices/lookup\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -7482,6 +7944,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/payments \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/payments\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -7642,6 +8116,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/payments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/payments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7741,6 +8227,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/voice-calls \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/voice-calls\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -7888,6 +8386,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/voice-calls/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/voice-calls/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7986,6 +8496,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/pricebook \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/pricebook\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -8135,6 +8657,18 @@
             ]
           }
         ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/pricebook/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/pricebook/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -8233,6 +8767,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/communications \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/communications\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -8410,6 +8956,18 @@
             "bearerAuth": [
               "read"
             ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/communications/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/communications/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
           }
         ],
         "parameters": [
@@ -9011,5 +9569,29 @@
         }
       }
     }
-  }
+  },
+  "x-tagGroups": [
+    {
+      "name": "API resources",
+      "tags": [
+        "Customers",
+        "Properties",
+        "Equipment",
+        "Jobs",
+        "Memberships",
+        "Estimates",
+        "Invoices",
+        "Payments",
+        "Voice Calls",
+        "Pricebook",
+        "Communications"
+      ]
+    },
+    {
+      "name": "Real-time events",
+      "tags": [
+        "Webhooks"
+      ]
+    }
+  ]
 }

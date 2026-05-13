@@ -82,7 +82,39 @@
       expand-single-schema-field="true"
       hide-download-button="false"
       sort-tags-alphabetically="false"
-      theme='{"colors": {"primary": {"main": "#0f0f0f"}}, "typography": {"fontFamily": "Roboto, system-ui, sans-serif", "headings": {"fontFamily": "Montserrat, sans-serif"}}}'
+      path-in-middle-panel
+      json-sample-expand-level="3"
+      schema-expansion-level="1"
+      theme='{
+        "colors": {
+          "primary": {"main": "#0f0f0f"},
+          "success": {"main": "#10b981"},
+          "warning": {"main": "#f59e0b"},
+          "error": {"main": "#ef4444"},
+          "text": {"primary": "#0f0f0f", "secondary": "#52525b"},
+          "border": {"dark": "#e4e4e7", "light": "#f4f4f5"},
+          "http": {"get": "#10b981", "post": "#3b82f6", "patch": "#f59e0b", "delete": "#ef4444"}
+        },
+        "typography": {
+          "fontSize": "14.5px",
+          "lineHeight": "1.55",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif",
+          "headings": {"fontFamily": "-apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif", "fontWeight": "600"},
+          "code": {"fontFamily": "ui-monospace, SFMono-Regular, Menlo, monospace", "fontSize": "13px"}
+        },
+        "sidebar": {
+          "backgroundColor": "#fafafa",
+          "textColor": "#27272a",
+          "width": "280px"
+        },
+        "rightPanel": {
+          "backgroundColor": "#0f0f0f",
+          "textColor": "#fafafa",
+          "width": "40%"
+        },
+        "codeBlock": {"backgroundColor": "#18181b"},
+        "schema": {"nestedBackground": "#fafafa"}
+      }'
     ></redoc>
     <script src="https://cdn.redocly.com/redoc/latest/bundles/redoc.standalone.js"></script>
   </body>
