@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Run a Call External API</title>
+    <meta
+      name="description"
+      content="Bearer-authenticated REST API for pushing data into and pulling data out of Run a Call. CRUD on customers, properties, equipment, jobs, memberships. Read-only on estimates, invoices, payments, voice calls, pricebook, communications. HMAC-signed webhooks for 14 canonical events."
+    />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <redoc
+      spec-url="./openapi.json"
+      hide-loading
+      expand-responses="200,201"
+      expand-single-schema-field="true"
+      hide-download-button="false"
+      sort-tags-alphabetically="false"
+      theme='{"colors": {"primary": {"main": "#0f0f0f"}}, "typography": {"fontFamily": "Roboto, system-ui, sans-serif", "headings": {"fontFamily": "Montserrat, sans-serif"}}}'
+    ></redoc>
+    <script src="https://cdn.redocly.com/redoc/latest/bundles/redoc.standalone.js"></script>
+  </body>
+</html>
