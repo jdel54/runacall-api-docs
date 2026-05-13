@@ -11,8 +11,12 @@
   },
   "servers": [
     {
+      "url": "https://app.runacall.com/api/v1",
+      "description": "Production — app subdomain (works today)"
+    },
+    {
       "url": "https://api.runacall.com/v1",
-      "description": "Production (bearer-token surface)"
+      "description": "Production — canonical bearer surface (preferred once DNS is live)"
     }
   ],
   "tags": [
