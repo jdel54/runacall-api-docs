@@ -48,6 +48,25 @@
         border: 1px solid #e5e5e5;
       }
       .docs-actions a.secondary:hover { background: #f5f5f5; }
+
+      /* Wrap long code lines in Stoplight Elements response / request
+         examples instead of horizontal-scrolling. Targets pre/code blocks
+         inside the elements-api web component; inline <code> tags (no
+         <pre> parent) keep their default rendering. */
+      elements-api pre,
+      elements-api pre > code,
+      elements-api .sl-code-viewer,
+      elements-api .sl-code-viewer__scroller {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        overflow-x: hidden !important;
+      }
+      /* Preserve indentation on wrapped lines — tab-size 2 + break only at
+         spaces/non-alpha so URL paths / identifiers stay readable. */
+      elements-api pre code {
+        tab-size: 2;
+      }
     </style>
   </head>
   <body>
