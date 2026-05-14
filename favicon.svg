@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&amp;display=swap');
+    .ios-r { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; font-size: 620px; letter-spacing: -28px; }
+  </style>
+  <rect width="1024" height="1024" rx="230" fill="#0e7c5a"/>
+  <text x="430" y="700" text-anchor="middle" class="ios-r" fill="#fbfaf7">r</text>
+  <circle cx="640" cy="660" r="44" fill="#fbfaf7" opacity="0.85"/>
+</svg>
