@@ -408,6 +408,194 @@
           "data"
         ]
       },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-based ordinal within the parent job. Day 1 = sequence 1, Day 2 = sequence 2, etc.",
+            "examples": [
+              1
+            ]
+          },
+          "scheduled_date": {
+            "type": "string",
+            "examples": [
+              "2026-05-20"
+            ]
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "on_way",
+              "arrived",
+              "in_progress",
+              "wrap",
+              "complete",
+              "cancelled"
+            ],
+            "description": "Forward-only state machine. `wrap` = end-of-day on a multi-day install (the appointment is done for today, but the install isn't complete). Only the final-day appointment moves to `complete`."
+          },
+          "customer_notified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set when the on-the-way SMS fires (Lead-only action)."
+          },
+          "actual_arrival": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "actual_complete": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notes_for_crew": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "Customer is home all day. Side gate code 4421."
+            ]
+          },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Assignment"
+            },
+            "description": "Crew assigned to this appointment. Ordered Lead-first, then helpers alphabetical by tech_id."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "organization_id",
+          "sequence",
+          "scheduled_date",
+          "scheduled_start",
+          "scheduled_end",
+          "status",
+          "customer_notified_at",
+          "actual_arrival",
+          "actual_complete",
+          "notes_for_crew",
+          "assignments",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "Assignment": {
+        "type": "object",
+        "properties": {
+          "tech_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Profile id of the tech assigned to this appointment."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "helper"
+            ],
+            "description": "Exactly one Lead per appointment (DB partial unique index). Lead owns all customer-facing actions; helpers own their own clock state only."
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Optional per-tech window override. When null, falls back to the appointment-level scheduled_start."
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "tech_state": {
+            "type": "string",
+            "enum": [
+              "off_clock",
+              "en_route",
+              "on_site",
+              "on_break",
+              "off_site"
+            ],
+            "description": "Independent per-tech state. Driven by the mobile app — not mutable via the External API in v1 (clock-in is a tech-on-device flow)."
+          },
+          "clocked_in_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "clocked_out_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "tech_id",
+          "role",
+          "scheduled_start",
+          "scheduled_end",
+          "tech_state",
+          "clocked_in_at",
+          "clocked_out_at"
+        ]
+      },
       "Job": {
         "type": "object",
         "properties": {
@@ -453,7 +641,8 @@
               "string",
               "null"
             ],
-            "format": "uuid"
+            "format": "uuid",
+            "description": "Lead of the next-incomplete appointment (trigger-maintained denormalization from `appointments` → `appointment_assignments`). Preserves backward compatibility for integrators that consumed the legacy 1-tech-per-job shape."
           },
           "status": {
             "type": "string",
@@ -564,6 +753,29 @@
             ],
             "format": "uuid"
           },
+          "is_multi_day": {
+            "type": "boolean",
+            "description": "True when this job has more than one appointment row."
+          },
+          "total_days": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Total appointment count (>= 1). 1 for service calls, 2+ for multi-day installs.",
+            "examples": [
+              1
+            ]
+          },
+          "is_multi_tech": {
+            "type": "boolean",
+            "description": "True when any appointment of this job has more than one assignment. DERIVED at wire-build time — accurate only when `appointments` are embedded (always on detail; opt-in via `?include=appointments` on list). When appointments are not embedded, this field defaults to `false` — set the query parameter if you need exact multi-tech detection on list responses."
+          },
+          "appointments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Appointment"
+            },
+            "description": "Embedded appointments[]. Always present on `GET /api/v1/jobs/{id}` (detail). Present on list responses ONLY when `?include=appointments` is set. Omitted otherwise."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -596,6 +808,9 @@
           "work_performed",
           "parent_job_id",
           "estimate_id",
+          "is_multi_day",
+          "total_days",
+          "is_multi_tech",
           "created_at",
           "updated_at"
         ]
@@ -2017,6 +2232,222 @@
           "data"
         ]
       },
+      "AppointmentScheduledEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "appointment.scheduled"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Appointment"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "appointment"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
+      "AppointmentStatus_changedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "appointment.status_changed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Appointment"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "appointment"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
+      "AppointmentCompletedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "appointment.completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Appointment"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "appointment"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
+      "AppointmentAssignments_changedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "appointment.assignments_changed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Appointment"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "appointment"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
       "CustomerList": {
         "type": "object",
         "properties": {
@@ -3401,6 +3832,225 @@
           "status"
         ],
         "description": "Status-only per spec §4. Invalid transitions (per VALID_STATUS_TRANSITIONS — same rules the UI enforces) return 422. No-op (same status) returns 200 with the unchanged row."
+      },
+      "AppointmentBareList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Appointment"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AppointmentDetail": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Appointment"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AppointmentWriteRequest": {
+        "type": "object",
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99,
+            "description": "1-based ordinal within the parent job. Server-assigned (max+1) when omitted; provide explicitly only to insert before existing appointments (advanced).",
+            "examples": [
+              2
+            ]
+          },
+          "scheduled_date": {
+            "type": "string",
+            "examples": [
+              "2026-05-21"
+            ]
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "2026-05-21T13:00:00Z"
+            ]
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "2026-05-21T21:00:00Z"
+            ]
+          },
+          "notes_for_crew": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 5000,
+            "examples": [
+              "Pull permit before 9am — Building Dept opens at 8."
+            ]
+          },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tech_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "lead",
+                    "helper"
+                  ],
+                  "examples": [
+                    "helper"
+                  ]
+                }
+              },
+              "required": [
+                "tech_id"
+              ]
+            },
+            "maxItems": 20,
+            "description": "Optional inline crew. At most one Lead per appointment (the partial unique index enforces it). When you need to promote a Helper to Lead later, PATCH /assignments/{tech_id} — that auto-demotes the previous Lead."
+          }
+        },
+        "required": [
+          "scheduled_date"
+        ],
+        "description": "Add a day to a multi-day install. Body shape is intentionally narrow — appointment status starts at 'scheduled' (transition via PATCH), `customer_notified_at` is server-stamped on Lead actions, `actual_*` are field-side outputs."
+      },
+      "AppointmentPatchRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "on_way",
+              "arrived",
+              "in_progress",
+              "wrap",
+              "complete",
+              "cancelled"
+            ]
+          },
+          "scheduled_date": {
+            "type": "string",
+            "examples": [
+              "2026-05-22"
+            ]
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes_for_crew": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "description": "All fields optional. Status changes follow the forward-only transition table — invalid transitions return 422. Empty body is a no-op (returns the row as-is)."
+      },
+      "AssignmentDetail": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Assignment"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AssignmentWriteRequest": {
+        "type": "object",
+        "properties": {
+          "tech_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "helper"
+            ],
+            "examples": [
+              "helper"
+            ]
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional per-tech window override; falls back to the appointment-level window when null."
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "tech_id"
+        ],
+        "description": "Add a tech to an appointment with a role. POSTing role='lead' to an appointment that already has a Lead returns 409 — PATCH the new tech's assignment to promote (auto-demotes the previous Lead)."
+      },
+      "AssignmentPatchRequest": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "helper"
+            ]
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "description": "Change a tech's role on an appointment or update their per-tech window override. Promoting to Lead auto-demotes the previous Lead. `tech_state` / clock fields are mobile-app-driven, not exposed for write."
       },
       "MembershipList": {
         "type": "object",
@@ -6410,6 +7060,811 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/appointments": {
+      "get": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "List appointments of a job",
+        "description": "Returns every appointment of the given job (single round-trip, not paginated — a job's appointment count is bounded). For multi-day installs, ordered by `sequence` ascending. For service calls, returns exactly one appointment.",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/appointments \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/appointments\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Job UUID."
+            },
+            "required": true,
+            "description": "Job UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All appointments of this job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentBareList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Add an appointment (day) to a multi-day install",
+        "description": "Server picks the next sequence (max+1) when `sequence` is omitted. Optional inline crew via `assignments[]` — at most one Lead per appointment. POSTing to a job in `cancelled` or `closed` status returns 422.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/appointments \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/appointments\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Job UUID."
+            },
+            "required": true,
+            "description": "Job UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentWriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created — the new appointment with its assignments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments/{id}": {
+      "get": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Get an appointment",
+        "description": "Returns the appointment with its full crew assignments embedded. Same shape as `GET /jobs/{id}` returns inside the embedded `appointments[]` array.",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Appointment UUID."
+            },
+            "required": true,
+            "description": "Appointment UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Single appointment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Update an appointment",
+        "description": "All fields optional. Status changes follow the forward-only transition table (`scheduled → on_way → arrived → in_progress → wrap → complete`, plus `cancelled` from any non-terminal). Invalid transitions return 422.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Appointment UUID."
+            },
+            "required": true,
+            "description": "Appointment UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentPatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — appointment updated (or no-op idempotent return).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments/{id}/assignments": {
+      "post": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Add a tech assignment to an appointment",
+        "description": "Adds the tech with the specified role. POSTing `role='lead'` when the appointment already has a Lead returns 409 — PATCH to promote (which auto-demotes the previous Lead). The `(appointment_id, tech_id)` pair is unique; re-adding the same tech returns 409.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/assignments \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/assignments\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Appointment UUID."
+            },
+            "required": true,
+            "description": "Appointment UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentWriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created — the new assignment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments/{id}/assignments/{tech_id}": {
+      "patch": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Update a tech assignment (role or window)",
+        "description": "Promoting to `lead` auto-demotes the previous Lead within the same appointment. The partial unique index allows zero leads momentarily but never two. `tech_state` and clock fields are not exposed for write — those are mobile-app-driven.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/assignments/{tech_id} \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/appointments/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/assignments/{tech_id}\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Appointment UUID."
+            },
+            "required": true,
+            "description": "Appointment UUID.",
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Profile UUID of the assigned tech."
+            },
+            "required": true,
+            "description": "Profile UUID of the assigned tech.",
+            "name": "tech_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentPatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — assignment updated (or no-op idempotent return).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentDetail"
                 }
               }
             }
@@ -9549,6 +11004,142 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/MembershipCancelledEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "appointment.scheduled": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "appointment.scheduled",
+        "description": "A new appointment was created (e.g., dispatcher adding Day 2 to a multi-day install, or the first appointment auto-created on `job.scheduled`). Fires once per appointment row.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentScheduledEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "appointment.status_changed": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "appointment.status_changed",
+        "description": "An appointment's status changed (`scheduled → on_way → arrived → in_progress → wrap → complete`, or `cancelled`). `appointment.completed` fires alongside this one when the target status is `complete`.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentStatus_changedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "appointment.completed": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "appointment.completed",
+        "description": "An appointment transitioned to `complete`. For multi-day installs, fires only on the final day's appointment — that's the moment the parent job auto-cascades to `completed` and `job.completed` fires too.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentCompletedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "appointment.assignments_changed": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "appointment.assignments_changed",
+        "description": "The crew on an appointment changed — tech added, removed, role promoted/demoted, or per-tech window override edited. Payload carries the FULL updated assignments[] array, not a delta.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentAssignments_changedEnvelope"
               }
             }
           }
