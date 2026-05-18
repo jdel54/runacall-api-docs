@@ -71,6 +71,11 @@ date-only fields) are unaffected.
 The same fields, when emitted inside webhook payloads, also carry real
 UTC — the conversion applies at the org-to-integrator boundary
 regardless of transport (REST response or webhook delivery body).
+Both transports run through the same `convertResponseTimestamps`
+helper at the boundary, so subscribers polling
+`GET /api/v1/jobs/{id}` and subscribers receiving the matching
+`job.scheduled` webhook see byte-identical timestamp shapes for the
+same logical event.
 
 ### What integrators should do
 
