@@ -2030,6 +2030,14 @@
           },
           "status": {
             "type": "string",
+            "enum": [
+              "active",
+              "non_renewing",
+              "suspended",
+              "cancelled",
+              "expired"
+            ],
+            "description": "Membership lifecycle state. `active` = currently paid and auto-renewing. `non_renewing` = customer cancelled — benefits + visits remain through end_date, no future billing cycles. `suspended` = paused by the org — billing paused, benefits paused, clock resumes on reactivate. `cancelled` = ended immediately (admin override). `expired` = end_date passed without renewal (terminal).",
             "examples": [
               "active"
             ]

@@ -12,6 +12,33 @@ during which clients should update.
 
 ---
 
+## 2026-05-22 — Non-breaking: `ApiMembership.status` may now return `non_renewing`
+
+A new lifecycle state landed for `customer_memberships.status`. Existing values (`active`, `suspended`, `cancelled`, `expired`) remain unchanged.
+
+- **`non_renewing`** — customer cancelled their auto-renewal. Membership is still active through `end_date` (visits + benefits continue), but no further billing cycles will charge. Daily cron transitions `non_renewing → expired` when `end_date` passes.
+
+### Integrator action
+
+If you switch/case on `ApiMembership.status`, **add a `non_renewing` case**. Recommended default: treat it the same as `active` for most read paths (the customer is still a member). Diverge only where your logic specifically cares about renewal intent.
+
+```js
+switch (membership.status) {
+  case "active":
+  case "non_renewing":  // ← still a member, just not renewing
+    return MEMBER_BENEFITS;
+  case "suspended":
+    return PAUSED_STATE;
+  case "cancelled":
+  case "expired":
+    return NON_MEMBER;
+}
+```
+
+No webhook event fires on the `active → non_renewing` transition in v1. The `membership.cancelled` event continues to fire only on the terminal `cancelled` value (admin override). Subscribers who want non-renewal signal can poll `GET /api/v1/memberships?status=non_renewing` until a dedicated event ships.
+
+---
+
 ## 2026-05-22 — Non-breaking: two new membership lifecycle webhook events
 
 Two webhook events are now available for subscription:
