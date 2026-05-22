@@ -776,6 +776,26 @@
             },
             "description": "Embedded appointments[]. Always present on `GET /api/v1/jobs/{id}` (detail). Present on list responses ONLY when `?include=appointments` is set. Omitted otherwise."
           },
+          "membership_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Phase 20 (M0.e): the customer's membership at job creation time, or `null` for non-member jobs. Maintained at write time by job-creation paths (M0.f); historical jobs backfilled by migration 185 using a best-effort match (most recent `membership.start_date <= job.created_at`)."
+          },
+          "coverage_type": {
+            "type": "string",
+            "enum": [
+              "membership_covered",
+              "membership_billable",
+              "non_member"
+            ],
+            "description": "Phase 20 (M0.e): coverage classification per the memberships plan §2 decision #13. `membership_covered` = cron-scheduled tune-up (included scope $0). `membership_billable` = repair / add-on for a member at the member rate. `non_member` = standard rate (default for everyone else).",
+            "examples": [
+              "non_member"
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -811,6 +831,8 @@
           "is_multi_day",
           "total_days",
           "is_multi_tech",
+          "membership_id",
+          "coverage_type",
           "created_at",
           "updated_at"
         ]

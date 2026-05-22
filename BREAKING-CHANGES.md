@@ -12,6 +12,26 @@ during which clients should update.
 
 ---
 
+## 2026-05-23 — Non-breaking: `ApiJob` gains `membership_id` + `coverage_type`
+
+Two new fields on every `Job` response — additive, existing integrators see the fields appended and can safely ignore them.
+
+- **`membership_id`** (`string | null`) — the customer's membership at job creation time, or `null` for non-member jobs.
+- **`coverage_type`** (`"membership_covered" | "membership_billable" | "non_member"`) — coverage classification per the memberships pricing model:
+  - `membership_covered` — cron-scheduled tune-up; included scope is $0
+  - `membership_billable` — repair or add-on for a member at the member rate
+  - `non_member` — standard rate (default for everyone else)
+
+### Integrator action
+
+Optional. If your integration sums invoice line items into reports, you can now filter by `Job.coverage_type === "membership_billable"` to compute member-discount-eligible revenue, or by `"membership_covered"` to count maintenance visits delivered.
+
+Historical jobs are backfilled by migration 185 using a best-effort match (most recent `membership.start_date <= job.created_at`). New jobs are stamped at creation time once Phase 20 M0.f ships. No write surface — the field is server-derived; POST/PATCH bodies cannot set it (they're rejected by `.strict()` parsing).
+
+The DB also gained `invoice_line_items.is_included` (boolean default false) but that table is not yet exposed on the public API. It'll appear in a future release alongside the invoice line-items endpoint.
+
+---
+
 ## 2026-05-22 — Non-breaking: `ApiMembership.status` may now return `non_renewing`
 
 A new lifecycle state landed for `customer_memberships.status`. Existing values (`active`, `suspended`, `cancelled`, `expired`) remain unchanged.
