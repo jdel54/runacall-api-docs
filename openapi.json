@@ -2147,6 +2147,14 @@
             ],
             "format": "date-time"
           },
+          "last_renewed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Phase 21 (M1.b): timestamp of the most recent successful renewal rollover. `null` until the first renewal invoice is paid. The `membership.renewed` webhook fires once per rollover."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -2171,6 +2179,7 @@
           "cancelled_at",
           "cancellation_reason",
           "suspended_at",
+          "last_renewed_at",
           "created_at",
           "updated_at"
         ]
@@ -11121,7 +11130,7 @@
           "Webhooks"
         ],
         "summary": "membership.renewed",
-        "description": "Reserved. Not currently emitted — the Stripe Connect `invoice.paid` → `customer_memberships` correlation requires a Connect-routed handler that ships in a future phase. Subscribers should poll `GET /api/v1/memberships?status=active` until then.",
+        "description": "A renewal invoice was paid and the membership rolled forward — `next_billing_date`, `next_maintenance_date`, and `end_date` advanced one billing cycle; `maintenance_jobs_created_count` reset to 0; `last_renewed_at` stamped to now. Fires from the manual mark-paid path today; Stripe Connect autopay flows through the same handler in a later phase. Idempotent — re-fires of the same `invoice.paid` event (e.g., Stripe webhook retries) do NOT double-emit.",
         "requestBody": {
           "required": true,
           "description": "Webhook event envelope POST'd to the subscriber URL.",

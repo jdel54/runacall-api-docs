@@ -12,6 +12,28 @@ during which clients should update.
 
 ---
 
+## 2026-05-23 — `membership.renewed` webhook is now ACTIVE
+
+The `membership.renewed` event has been reserved in the catalog since the External REST API shipped, but the event never actually fired — the description warned subscribers it was "Not currently emitted". **That changes today.** Subscribers who registered for `membership.renewed` will begin receiving real deliveries on every renewal-invoice payment.
+
+### What fires the event
+
+When a renewal invoice (`Invoice.invoice_type === "membership_renewal"`) is marked paid (by any method — manual mark-paid in the office, mobile field collection, future Stripe Connect autopay), the membership advances one billing cycle: `next_billing_date` and `end_date` move forward, `next_maintenance_date` rolls, `maintenance_jobs_created_count` resets to 0, and `last_renewed_at` is stamped. The webhook fires once per rollover with the full `ApiMembership` payload showing the new dates.
+
+### Idempotency
+
+The rollover is enforced via an atomic UPDATE-with-WHERE on `next_billing_date`, so Stripe webhook retries firing `invoice.paid` twice produce exactly one `membership.renewed` event — never two.
+
+### ApiMembership gains `last_renewed_at`
+
+Same release: `ApiMembership` now exposes a `last_renewed_at` field (timestamp, nullable). `null` until the first renewal payment processes; set thereafter to the moment of the most recent successful rollover. Additive — existing integrators see the field appended and can safely ignore it.
+
+### Integrator action
+
+Subscribers who registered for `membership.renewed` need no action — events begin flowing. If your handler doesn't exist yet, register one. The event order on a renewal payment is: `payment.received` → `invoice.paid` → `membership.renewed`.
+
+---
+
 ## 2026-05-23 — Non-breaking: `ApiInvoice` gains `membership_id` + `invoice_type`
 
 Two new fields on every `Invoice` response — additive, existing integrators see the fields appended and can safely ignore them.
