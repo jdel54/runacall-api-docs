@@ -12,6 +12,19 @@ during which clients should update.
 
 ---
 
+## 2026-05-22 — Non-breaking: two new membership lifecycle webhook events
+
+Two webhook events are now available for subscription:
+
+- **`membership.suspended`** — fires when a membership is suspended via the UI `Suspend` action or a REST PATCH to `status='suspended'`. Payload is the full `ApiMembership` shape (status will be `suspended`, `suspended_at` stamped).
+- **`membership.reactivated`** — fires when a previously suspended membership is reactivated. Payload is the full `ApiMembership` shape (status `active`, `suspended_at` cleared to null).
+
+Both events are additive — existing subscriptions are unaffected. Subscribe via Settings → Integrations → Webhooks or the `webhook_subscriptions` API.
+
+The terminal `membership.cancelled` event continues to behave as before; the new events cover the prior gap in the lifecycle (pause/resume).
+
+---
+
 ## 2026-05-18 — Phase 6: Multi-tech, multi-day + timezone-correct timestamps
 
 ### Summary

@@ -2232,6 +2232,114 @@
           "data"
         ]
       },
+      "MembershipSuspendedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "membership.suspended"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Membership"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "membership"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
+      "MembershipReactivatedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "membership.reactivated"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Membership"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "membership"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
       "AppointmentScheduledEnvelope": {
         "type": "object",
         "properties": {
@@ -11004,6 +11112,74 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/MembershipCancelledEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "membership.suspended": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "membership.suspended",
+        "description": "A customer membership was suspended — billing paused, benefits paused, visit count preserved. Fires from the UI `Suspend` action or a REST PATCH to `status='suspended'`. Does NOT fire for the terminal `cancelled` transition (see `membership.cancelled`).",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipSuspendedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "membership.reactivated": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "membership.reactivated",
+        "description": "A previously suspended membership was reactivated — status returned to `active`. Fires from the UI `Reactivate` action or a REST PATCH that moves a non-`active`, non-`cancelled` membership to `status='active'`. Does NOT fire on initial enrollment (see `membership.created`).",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipReactivatedEnvelope"
               }
             }
           }
