@@ -2165,6 +2165,14 @@
               2
             ]
           },
+          "autopay_enabled": {
+            "type": "boolean",
+            "description": "Phase 21 (M1.f): true when the member has opted in to off-session Stripe Connect autopay AND a vaulted PaymentMethod is on file for the org's Connect account. Read-only on this surface — turning autopay on requires Stripe-side card tokenization done in the in-app settings flow, not via REST.",
+            "examples": [
+              false,
+              true
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -2191,6 +2199,7 @@
           "suspended_at",
           "last_renewed_at",
           "units",
+          "autopay_enabled",
           "created_at",
           "updated_at"
         ]
@@ -4365,6 +4374,7 @@
             "type": "string",
             "enum": [
               "active",
+              "non_renewing",
               "suspended",
               "cancelled",
               "expired"
@@ -4374,6 +4384,8 @@
             "type": "string",
             "enum": [
               "monthly",
+              "quarterly",
+              "semi_annual",
               "annual"
             ]
           },
@@ -4425,6 +4437,7 @@
             "type": "string",
             "enum": [
               "active",
+              "non_renewing",
               "suspended",
               "cancelled",
               "expired"
