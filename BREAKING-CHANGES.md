@@ -12,6 +12,25 @@ during which clients should update.
 
 ---
 
+## 2026-05-24 — `ApiMembership.units` field (additive)
+
+`ApiMembership` now exposes a `units` integer field representing the number of equipment units the membership covers. Default value is `1`, matching the pre-M5.a flat-pricing semantics. The field is integer, non-null, range 1-100.
+
+This is **additive only** — existing integrators see the new field appended on every membership read/write and can safely ignore it. No webhook event payloads change shape beyond gaining the new field on `ApiMembership`.
+
+### Why
+
+The HVAC contractor market needs per-equipment pricing for multi-system households. A 1-system home and a 4-system mansion shouldn't pay the same flat membership rate. Phase 25 introduces this model:
+
+- Existing plans + memberships keep working unchanged (flat pricing × `units=1` = same money as before).
+- Plans that opt into per-unit pricing (set `price_per_unit` on the plan) charge `price_per_unit + (units - 1) × price_each_additional`, capped at `max_units`. Plan-level pricing fields are internal-only in this release — exposed in `ApiPlan` only when M5.b lands.
+
+### Integrator action
+
+None required. Read `units` when present, default to `1` when older data lacks the field.
+
+---
+
 ## 2026-05-23 — `membership.renewed` webhook is now ACTIVE
 
 The `membership.renewed` event has been reserved in the catalog since the External REST API shipped, but the event never actually fired — the description warned subscribers it was "Not currently emitted". **That changes today.** Subscribers who registered for `membership.renewed` will begin receiving real deliveries on every renewal-invoice payment.
