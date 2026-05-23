@@ -2411,6 +2411,60 @@
           "data"
         ]
       },
+      "MembershipTransferredEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "membership.transferred"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Membership"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "membership"
+                    ]
+                  }
+                },
+                "required": [
+                  "object"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "organization_id",
+          "data"
+        ]
+      },
       "AppointmentScheduledEnvelope": {
         "type": "object",
         "properties": {
@@ -4381,6 +4435,29 @@
           "status"
         ],
         "description": "Status-only per spec §4."
+      },
+      "MembershipTransferRequest": {
+        "type": "object",
+        "properties": {
+          "to_customer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the new homeowner. Must belong to the same organization."
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500,
+            "description": "Optional dispatcher-typed note recorded on the audit row. Example: 'house sold to John Smith Mar 2026'."
+          }
+        },
+        "required": [
+          "to_customer_id"
+        ],
+        "additionalProperties": false,
+        "description": "House-sale transfer body. Sends the membership to a new homeowner with audit trail. `customer_id` is the only field that changes."
       },
       "EstimateList": {
         "type": "object",
@@ -8785,6 +8862,149 @@
         }
       }
     },
+    "/memberships/{id}/transfer": {
+      "post": {
+        "tags": [
+          "Memberships"
+        ],
+        "summary": "Transfer a membership to a new homeowner (house-sale flip)",
+        "description": "Flips the membership's `customer_id` to the new owner. Status, dates, visit counters, and the payment ledger all stay attached. Equipment is property-scoped and does NOT migrate — the new owner inherits the property and its attached units automatically. Emits the `membership.transferred` webhook. Cancelled or expired memberships cannot be transferred — re-enroll the new owner instead.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/memberships/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/transfer \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/memberships/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/transfer\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resource UUID."
+            },
+            "required": true,
+            "description": "Resource UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipTransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — transfer applied. Body returns the full updated membership with the new `customer_id`. Idempotent: a transfer to the same `customer_id` returns 200 without re-emitting the webhook.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/estimates": {
       "get": {
         "tags": [
@@ -11251,6 +11471,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/MembershipReactivatedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "membership.transferred": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "membership.transferred",
+        "description": "A membership was re-attached from the previous homeowner to a new buyer when the house sold. The payload is the membership wire shape with the NEW `customer_id` in place; visit history, `end_date`, `start_date`, `units`, and `next_billing_date` all stay unchanged. The `from_customer_id` is available in the audit trail; subscribers needing it can call `GET /api/v1/memberships/{id}/transfers`. Equipment is property-scoped and does NOT migrate with the membership — it stays attached to the property whose owner changed.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipTransferredEnvelope"
               }
             }
           }

@@ -12,6 +12,32 @@ during which clients should update.
 
 ---
 
+## 2026-05-24 — `POST /memberships/{id}/transfer` endpoint + `membership.transferred` event (additive)
+
+A new endpoint and a new canonical webhook event ship with Phase 27 M7.e — house-sale membership transfer.
+
+### What's new
+
+- **`POST /api/v1/memberships/{id}/transfer`** — Body: `{ to_customer_id: string (UUID), reason?: string }`. Returns the full updated `ApiMembership` with the new `customer_id` in place. Status, `end_date`, `start_date`, `units`, `next_billing_date`, the linked payment ledger, and visit counters all stay untouched. Requires the `write` scope. Idempotent: a transfer to the same `customer_id` returns 200 with the existing row and does NOT re-emit the webhook. Cancelled or expired memberships return 422 — re-enroll the new owner instead.
+- **`membership.transferred` event** — fires once per successful transfer. Payload is the membership wire shape with the NEW `customer_id`. The previous `from_customer_id` is available via the audit endpoint (`GET /api/v1/memberships/{id}/transfers` ships in a follow-up).
+
+### Why
+
+When a member sells their house, equipment stays with the property and the new owner inherits the maintenance plan. No competitor in the small-mid HVAC market supports this flow today — owners currently work around it with manual cancel-and-re-enroll, which loses the visit history and start date that defends the program's value over time. Phase 27's house-sale transfer makes the carry-over one click.
+
+### Equipment is property-scoped — does NOT migrate
+
+Equipment FKs are on `properties` (via `property_id`), and properties are property-scoped — the new homeowner inherits the property and its attached units automatically through the property-ownership change. The membership row is the only thing whose FK we flip in this endpoint.
+
+### Integrator action
+
+None required. The new endpoint and event are opt-in:
+
+- Add `"membership.transferred"` to your subscription's `events[]` array if you want delivery; otherwise the new event simply never fires for you.
+- Calling `POST /memberships/{id}/transfer` is a new write path you choose to consume — no existing endpoint changes shape or behavior.
+
+---
+
 ## 2026-05-24 — `ApiMembership.units` field (additive)
 
 `ApiMembership` now exposes a `units` integer field representing the number of equipment units the membership covers. Default value is `1`, matching the pre-M5.a flat-pricing semantics. The field is integer, non-null, range 1-100.
