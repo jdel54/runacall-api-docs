@@ -3511,13 +3511,11 @@
           },
           "source": {
             "type": "string",
-            "enum": [
-              "call",
-              "website",
-              "membership_auto",
-              "follow_up",
-              "estimate_conversion",
-              "recurring"
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "Lead source for this job. Free-form text up to 50 chars. Suggested values: `call`, `website`, `membership_auto`, `follow_up`, `estimate_conversion`, `recurring` — but any string is accepted (e.g. `Google Adwords`, `Facebook Ductless`).",
+            "examples": [
+              "call"
             ]
           },
           "scheduled_date": {
@@ -9831,7 +9829,8 @@
                 "service",
                 "part",
                 "labor",
-                "bundle"
+                "bundle",
+                "equipment"
               ]
             },
             "required": false,
