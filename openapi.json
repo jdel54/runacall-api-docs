@@ -118,21 +118,11 @@
                       "customer"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "Customer": {
         "type": "object",
@@ -278,27 +268,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "first_name",
-          "last_name",
-          "company_name",
-          "email",
-          "phone",
-          "phone_alt",
-          "billing_address_line_1",
-          "billing_address_line_2",
-          "billing_city",
-          "billing_state",
-          "billing_zip",
-          "source",
-          "tags",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "CustomerUpdatedEnvelope": {
         "type": "object",
@@ -338,21 +308,11 @@
                       "customer"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "JobScheduledEnvelope": {
         "type": "object",
@@ -392,21 +352,11 @@
                       "job"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "Appointment": {
         "type": "object",
@@ -510,24 +460,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "job_id",
-          "organization_id",
-          "sequence",
-          "scheduled_date",
-          "scheduled_start",
-          "scheduled_end",
-          "status",
-          "customer_notified_at",
-          "actual_arrival",
-          "actual_complete",
-          "notes_for_crew",
-          "assignments",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "Assignment": {
         "type": "object",
@@ -585,16 +518,7 @@
             ],
             "format": "date-time"
           }
-        },
-        "required": [
-          "tech_id",
-          "role",
-          "scheduled_start",
-          "scheduled_end",
-          "tech_state",
-          "clocked_in_at",
-          "clocked_out_at"
-        ]
+        }
       },
       "Job": {
         "type": "object",
@@ -804,38 +728,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "customer_id",
-          "property_id",
-          "equipment_id",
-          "assigned_tech_id",
-          "status",
-          "priority",
-          "type",
-          "source",
-          "scheduled_date",
-          "scheduled_start",
-          "scheduled_end",
-          "actual_arrival",
-          "actual_start",
-          "actual_end",
-          "problem_description",
-          "diagnosis",
-          "work_performed",
-          "parent_job_id",
-          "estimate_id",
-          "is_multi_day",
-          "total_days",
-          "is_multi_tech",
-          "membership_id",
-          "coverage_type",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "JobStatus_changedEnvelope": {
         "type": "object",
@@ -875,21 +768,11 @@
                       "job"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "JobCompletedEnvelope": {
         "type": "object",
@@ -929,21 +812,11 @@
                       "job"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "EstimateSentEnvelope": {
         "type": "object",
@@ -983,21 +856,11 @@
                       "estimate"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "EstimateOption": {
         "type": "object",
@@ -1039,16 +902,7 @@
           "sort_order": {
             "type": "number"
           }
-        },
-        "required": [
-          "id",
-          "tier",
-          "title",
-          "description",
-          "total_price",
-          "is_selected",
-          "sort_order"
-        ]
+        }
       },
       "Estimate": {
         "type": "object",
@@ -1160,25 +1014,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "customer_id",
-          "property_id",
-          "equipment_id",
-          "status",
-          "valid_until",
-          "customer_approved_at",
-          "notes",
-          "converted_job_id",
-          "currency",
-          "amount",
-          "options",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "EstimateApprovedEnvelope": {
         "type": "object",
@@ -1218,21 +1054,11 @@
                       "estimate"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "InvoiceIssuedEnvelope": {
         "type": "object",
@@ -1272,21 +1098,11 @@
                       "invoice"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "Invoice": {
         "type": "object",
@@ -1323,6 +1139,14 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "property_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Service-location FK. Set by the QBO importer for invoices that originally belonged to a QBO sub-customer (so per-location history survives flattening sub-customers into properties). Null for native invoices today."
           },
           "invoice_number": {
             "type": "string",
@@ -1426,29 +1250,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "customer_id",
-          "job_id",
-          "invoice_number",
-          "status",
-          "subtotal",
-          "tax_amount",
-          "tax_rate",
-          "total",
-          "currency",
-          "due_date",
-          "sent_at",
-          "paid_at",
-          "notes",
-          "membership_id",
-          "invoice_type",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "InvoicePaidEnvelope": {
         "type": "object",
@@ -1488,21 +1290,11 @@
                       "invoice"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "PaymentReceivedEnvelope": {
         "type": "object",
@@ -1542,21 +1334,11 @@
                       "payment"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "Payment": {
         "type": "object",
@@ -1622,20 +1404,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "invoice_id",
-          "amount",
-          "currency",
-          "method",
-          "status",
-          "stripe_payment_id",
-          "collected_at",
-          "collected_by",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "VoiceCallCompletedEnvelope": {
         "type": "object",
@@ -1675,21 +1444,11 @@
                       "voice_call"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "VoiceCallDetail": {
         "allOf": [
@@ -1717,11 +1476,7 @@
                   "https://storage.runacall.com/voice-recordings/{org}/{call_id}.mp3"
                 ]
               }
-            },
-            "required": [
-              "transcript",
-              "recording_url"
-            ]
+            }
           }
         ]
       },
@@ -1828,25 +1583,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "customer_id",
-          "call_direction",
-          "call_status",
-          "from_number",
-          "to_number",
-          "duration_seconds",
-          "is_spam",
-          "is_billable",
-          "summary",
-          "user_sentiment",
-          "call_intent",
-          "urgency_level",
-          "triage_status",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "VoiceFollowupCreatedEnvelope": {
         "type": "object",
@@ -1886,21 +1623,11 @@
                       "voice_followup"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "VoiceFollowup": {
         "type": "object",
@@ -1967,22 +1694,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "voice_call_id",
-          "customer_id",
-          "category",
-          "reason",
-          "urgency",
-          "callback_number",
-          "related_estimate_id",
-          "related_invoice_id",
-          "related_job_id",
-          "status",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "MembershipCreatedEnvelope": {
         "type": "object",
@@ -2022,21 +1734,11 @@
                       "membership"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "Membership": {
         "type": "object",
@@ -2181,28 +1883,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "customer_id",
-          "service_agreement_id",
-          "status",
-          "billing_cycle",
-          "start_date",
-          "end_date",
-          "next_billing_date",
-          "next_maintenance_date",
-          "cancelled_at",
-          "cancellation_reason",
-          "suspended_at",
-          "last_renewed_at",
-          "units",
-          "autopay_enabled",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "MembershipRenewedEnvelope": {
         "type": "object",
@@ -2242,21 +1923,11 @@
                       "membership"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "MembershipCancelledEnvelope": {
         "type": "object",
@@ -2296,21 +1967,11 @@
                       "membership"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "MembershipSuspendedEnvelope": {
         "type": "object",
@@ -2350,21 +2011,11 @@
                       "membership"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "MembershipReactivatedEnvelope": {
         "type": "object",
@@ -2404,21 +2055,11 @@
                       "membership"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "MembershipTransferredEnvelope": {
         "type": "object",
@@ -2458,21 +2099,11 @@
                       "membership"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "AppointmentScheduledEnvelope": {
         "type": "object",
@@ -2512,21 +2143,11 @@
                       "appointment"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "AppointmentStatus_changedEnvelope": {
         "type": "object",
@@ -2566,21 +2187,11 @@
                       "appointment"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "AppointmentCompletedEnvelope": {
         "type": "object",
@@ -2620,21 +2231,11 @@
                       "appointment"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "AppointmentAssignments_changedEnvelope": {
         "type": "object",
@@ -2674,21 +2275,11 @@
                       "appointment"
                     ]
                   }
-                },
-                "required": [
-                  "object"
-                ]
+                }
               }
             ]
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "created_at",
-          "organization_id",
-          "data"
-        ]
+        }
       },
       "CustomerList": {
         "type": "object",
@@ -2712,12 +2303,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "ErrorEnvelope": {
         "type": "object",
@@ -2757,18 +2343,9 @@
                   "req_a93a7817f5a8485d80204becea"
                 ]
               }
-            },
-            "required": [
-              "code",
-              "message",
-              "doc_url",
-              "request_id"
-            ]
+            }
           }
-        },
-        "required": [
-          "error"
-        ]
+        }
       },
       "CustomerDetail": {
         "type": "object",
@@ -2776,10 +2353,7 @@
           "data": {
             "$ref": "#/components/schemas/Customer"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "CustomerLookup": {
         "type": "object",
@@ -2790,11 +2364,7 @@
           "has_duplicates": {
             "type": "boolean"
           }
-        },
-        "required": [
-          "data",
-          "has_duplicates"
-        ]
+        }
       },
       "CustomerWriteRequest": {
         "type": "object",
@@ -3109,12 +2679,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "Property": {
         "type": "object",
@@ -3219,24 +2784,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "customer_id",
-          "address_line_1",
-          "address_line_2",
-          "city",
-          "state",
-          "zip",
-          "type",
-          "access_notes",
-          "lat",
-          "lng",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "PropertyDetail": {
         "type": "object",
@@ -3244,10 +2792,7 @@
           "data": {
             "$ref": "#/components/schemas/Property"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "PropertyWriteRequest": {
         "type": "object",
@@ -3478,12 +3023,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "Equipment": {
         "type": "object",
@@ -3597,24 +3137,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "external_id",
-          "external_source",
-          "property_id",
-          "type",
-          "manufacturer",
-          "model",
-          "serial_number",
-          "install_date",
-          "warranty_expiry",
-          "condition",
-          "notes",
-          "data_plate_photo_url",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "EquipmentDetail": {
         "type": "object",
@@ -3622,10 +3145,7 @@
           "data": {
             "$ref": "#/components/schemas/Equipment"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "EquipmentLookup": {
         "type": "object",
@@ -3636,11 +3156,7 @@
           "has_duplicates": {
             "type": "boolean"
           }
-        },
-        "required": [
-          "data",
-          "has_duplicates"
-        ]
+        }
       },
       "EquipmentWriteRequest": {
         "type": "object",
@@ -3888,12 +3404,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "JobDetail": {
         "type": "object",
@@ -3901,10 +3412,7 @@
           "data": {
             "$ref": "#/components/schemas/Job"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "JobWriteRequest": {
         "type": "object",
@@ -4084,10 +3592,7 @@
               "$ref": "#/components/schemas/Appointment"
             }
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "AppointmentDetail": {
         "type": "object",
@@ -4095,10 +3600,7 @@
           "data": {
             "$ref": "#/components/schemas/Appointment"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "AppointmentWriteRequest": {
         "type": "object",
@@ -4228,10 +3730,7 @@
           "data": {
             "$ref": "#/components/schemas/Assignment"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "AssignmentWriteRequest": {
         "type": "object",
@@ -4316,12 +3815,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "MembershipDetail": {
         "type": "object",
@@ -4329,10 +3823,7 @@
           "data": {
             "$ref": "#/components/schemas/Membership"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "MembershipWriteRequest": {
         "type": "object",
@@ -4494,12 +3985,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "EstimateDetail": {
         "type": "object",
@@ -4507,10 +3993,7 @@
           "data": {
             "$ref": "#/components/schemas/Estimate"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "InvoiceList": {
         "type": "object",
@@ -4534,12 +4017,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "InvoiceDetail": {
         "type": "object",
@@ -4547,10 +4025,7 @@
           "data": {
             "$ref": "#/components/schemas/Invoice"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "PaymentList": {
         "type": "object",
@@ -4574,12 +4049,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "PaymentDetail": {
         "type": "object",
@@ -4587,10 +4057,7 @@
           "data": {
             "$ref": "#/components/schemas/Payment"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "VoiceCallList": {
         "type": "object",
@@ -4614,12 +4081,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "VoiceCallDetailEnvelope": {
         "type": "object",
@@ -4627,10 +4089,7 @@
           "data": {
             "$ref": "#/components/schemas/VoiceCallDetail"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "PricebookList": {
         "type": "object",
@@ -4654,12 +4113,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "PricebookItem": {
         "type": "object",
@@ -4726,21 +4180,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "category_id",
-          "name",
-          "description",
-          "type",
-          "unit_price",
-          "unit_cost",
-          "currency",
-          "is_taxable",
-          "is_active",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "PricebookDetail": {
         "type": "object",
@@ -4748,10 +4188,7 @@
           "data": {
             "$ref": "#/components/schemas/PricebookItem"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       },
       "CommunicationList": {
         "type": "object",
@@ -4775,12 +4212,7 @@
             ],
             "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
           }
-        },
-        "required": [
-          "data",
-          "has_more",
-          "next_cursor"
-        ]
+        }
       },
       "Communication": {
         "type": "object",
@@ -4857,22 +4289,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "id",
-          "customer_id",
-          "job_id",
-          "channel",
-          "direction",
-          "type",
-          "recipient",
-          "message_body",
-          "status",
-          "twilio_message_sid",
-          "sent_at",
-          "created_at",
-          "updated_at"
-        ]
+        }
       },
       "CommunicationDetail": {
         "type": "object",
@@ -4880,10 +4297,7 @@
           "data": {
             "$ref": "#/components/schemas/Communication"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       }
     },
     "parameters": {}
@@ -5834,7 +5248,7 @@
         "tags": [
           "Properties"
         ],
-        "summary": "Get a propertie",
+        "summary": "Get a property",
         "security": [
           {
             "bearerAuth": [
@@ -6483,7 +5897,7 @@
         "tags": [
           "Equipment"
         ],
-        "summary": "Get a equipment",
+        "summary": "Get equipment",
         "security": [
           {
             "bearerAuth": [
@@ -9172,7 +8586,7 @@
         "tags": [
           "Estimates"
         ],
-        "summary": "Get a estimate",
+        "summary": "Get an estimate",
         "security": [
           {
             "bearerAuth": [
@@ -9576,7 +8990,7 @@
         "tags": [
           "Invoices"
         ],
-        "summary": "Get a invoice",
+        "summary": "Get an invoice",
         "security": [
           {
             "bearerAuth": [
