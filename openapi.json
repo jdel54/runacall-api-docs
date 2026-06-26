@@ -999,6 +999,16 @@
               7850
             ]
           },
+          "signed_total": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Customer-signed all-in total snapshotted at approval — base items + the add-ons the customer accepted + discounts + tax. The legally-binding number the customer signed for, and the source of truth the auto-created job's invoice must match. `null` until the estimate is approved. Differs from `amount` (selected option's base price) only when the customer accepted add-on line items.",
+            "examples": [
+              8350
+            ]
+          },
           "options": {
             "type": "array",
             "items": {
@@ -1366,6 +1376,7 @@
           },
           "method": {
             "type": "string",
+            "description": "Payment method. One of: `credit_card`, `ach`, `zelle`, `wire`, `check`, `cash`.",
             "examples": [
               "credit_card"
             ]
@@ -3511,11 +3522,13 @@
           },
           "source": {
             "type": "string",
-            "minLength": 1,
-            "maxLength": 50,
-            "description": "Lead source for this job. Free-form text up to 50 chars. Suggested values: `call`, `website`, `membership_auto`, `follow_up`, `estimate_conversion`, `recurring` — but any string is accepted (e.g. `Google Adwords`, `Facebook Ductless`).",
-            "examples": [
-              "call"
+            "enum": [
+              "call",
+              "website",
+              "membership_auto",
+              "follow_up",
+              "estimate_conversion",
+              "recurring"
             ]
           },
           "scheduled_date": {
@@ -9829,8 +9842,7 @@
                 "service",
                 "part",
                 "labor",
-                "bundle",
-                "equipment"
+                "bundle"
               ]
             },
             "required": false,
