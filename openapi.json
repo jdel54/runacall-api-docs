@@ -2331,6 +2331,7 @@
                   "not_found",
                   "method_not_allowed",
                   "conflict",
+                  "unsupported_media_type",
                   "rate_limited",
                   "internal_error"
                 ]
@@ -2503,12 +2504,13 @@
           },
           "source": {
             "type": "string",
-            "enum": [
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "Free-form attribution label (1–50 chars). Integrator-defined — use whatever taxonomy fits your reporting. Common values: `google`, `referral`, `angi`, `website`, `facebook`, `tiktok`, `truck-wrap`, `trade-show`, `other`.",
+            "examples": [
               "google",
-              "referral",
-              "angi",
-              "website",
-              "other"
+              "facebook",
+              "trade-show"
             ]
           },
           "tags": {
@@ -2643,12 +2645,13 @@
           },
           "source": {
             "type": "string",
-            "enum": [
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "Free-form attribution label (1–50 chars). Integrator-defined — use whatever taxonomy fits your reporting. Common values: `google`, `referral`, `angi`, `website`, `facebook`, `tiktok`, `truck-wrap`, `trade-show`, `other`.",
+            "examples": [
               "google",
-              "referral",
-              "angi",
-              "website",
-              "other"
+              "facebook",
+              "trade-show"
             ]
           },
           "tags": {
