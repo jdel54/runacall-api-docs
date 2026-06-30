@@ -314,6 +314,85 @@
           }
         }
       },
+      "CustomerTaggedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "customer.tagged"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CustomerTaggedData"
+          }
+        }
+      },
+      "CustomerTaggedData": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Customer"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "object": {
+                "type": "string",
+                "enum": [
+                  "customer.tagged"
+                ]
+              },
+              "tag": {
+                "$ref": "#/components/schemas/TaggedTag"
+              },
+              "tagged_by": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "tagged_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "TaggedTag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "JobScheduledEnvelope": {
         "type": "object",
         "properties": {
@@ -817,6 +896,67 @@
             ]
           }
         }
+      },
+      "JobTaggedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "job.tagged"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "$ref": "#/components/schemas/JobTaggedData"
+          }
+        }
+      },
+      "JobTaggedData": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Job"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "object": {
+                "type": "string",
+                "enum": [
+                  "job.tagged"
+                ]
+              },
+              "tag": {
+                "$ref": "#/components/schemas/TaggedTag"
+              },
+              "tagged_by": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "tagged_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
       },
       "EstimateSentEnvelope": {
         "type": "object",
@@ -4312,6 +4452,146 @@
             "$ref": "#/components/schemas/Communication"
           }
         }
+      },
+      "TagList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "examples": [
+              "vip"
+            ]
+          },
+          "color": {
+            "type": "string",
+            "examples": [
+              "amber"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "JobTagsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "examples": [
+                  [
+                    "vip",
+                    "recall"
+                  ]
+                ]
+              }
+            }
+          }
+        }
+      },
+      "JobTagsRequest": {
+        "type": "object",
+        "properties": {
+          "tag_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "tag_ids"
+        ],
+        "additionalProperties": false,
+        "description": "Set the exact tag list on a job (idempotent reconcile — tags in the body are added, tags not in the body are detached). Fires `job.tagged` webhook per newly-attached tag."
+      },
+      "PaymentCreateRequest": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "examples": [
+              478.2
+            ],
+            "description": "Payment amount in major units (e.g. dollars)."
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "credit_card",
+              "ach",
+              "zelle",
+              "wire",
+              "check",
+              "cash"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "succeeded",
+              "pending",
+              "failed",
+              "refunded"
+            ]
+          },
+          "collected_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Defaults to now in the org's timezone."
+          },
+          "stripe_payment_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "invoice_id",
+          "amount",
+          "method"
+        ],
+        "additionalProperties": false,
+        "description": "Record a payment against an invoice. Recomputes invoice status (paid / partial / unchanged) from sum of succeeded payments. If the payment closes the invoice, parent job status moves to `closed` (when it was at `invoiced`). Always fires `payment.received` webhook; fires `invoice.paid` when the invoice newly hits full payment."
       }
     },
     "parameters": {}
@@ -9396,6 +9676,144 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Record a payment",
+        "description": "Insert a payment against an invoice. Recomputes invoice status (paid / partial / unchanged) from the sum of succeeded payments. If the invoice newly hits full payment: stamps `paid_at`, closes the parent job (when status was `invoiced`), and fires both `payment.received` AND `invoice.paid` webhooks. Otherwise fires `payment.received` only.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/payments \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/payments\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — an existing row was updated. Returned when the supplied `external_id` + `external_source` matched an existing row (idempotent retry).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDetail"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created — a new row was inserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/payments/{id}": {
@@ -10351,6 +10769,270 @@
           }
         }
       }
+    },
+    "/tags": {
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "List tags",
+        "description": "Returns every tag in the calling org's catalog. Filterable by `?name=` (case-insensitive substring). Tags are managed in the dashboard; this endpoint is read-only.",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/tags \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/tags\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "examples": [
+                "100"
+              ]
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/tags": {
+      "post": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Set job tags",
+        "description": "Idempotent reconcile of a job's tag list. Tags in the request body are added (if not already attached); tags currently attached but absent from the body are detached. Fires `job.tagged` webhook for each newly-attached tag.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/tags \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/jobs/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a/tags\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resource UUID."
+            },
+            "required": true,
+            "description": "Resource UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobTagsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reconciled. Returns the canonical denormalized `tags` array on the job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTagsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "webhooks": {
@@ -10402,6 +11084,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CustomerUpdatedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "customer.tagged": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "customer.tagged",
+        "description": "A tag was attached to a customer via the customer_tags junction. Fires once per newly-attached tag (multi-tag writes fan out N events). Payload includes the full customer wire row plus a `tag` block (id, name, color) and the `tagged_by` profile id + `tagged_at` timestamp. Subscribers gating on a specific tag should compare `data.tag.id` (rename-stable) rather than `data.tag.name`.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerTaggedEnvelope"
               }
             }
           }
@@ -10504,6 +11220,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/JobCompletedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "job.tagged": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "job.tagged",
+        "description": "A tag was attached to a job via the job_tags junction. Same shape as `customer.tagged` — full job wire row + `tag` block + `tagged_by` + `tagged_at`. Fires once per newly-attached tag.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobTaggedEnvelope"
               }
             }
           }
