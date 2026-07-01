@@ -4326,6 +4326,40 @@
           "is_active": {
             "type": "boolean"
           },
+          "track_inventory": {
+            "type": "boolean",
+            "description": "When true, this item's stock is tracked. Automatically true for `type = part` items in orgs that have enabled inventory tracking; false otherwise. Read-only from the API — flip via the /settings/inventory UI.",
+            "examples": [
+              true
+            ]
+          },
+          "quantity_on_hand": {
+            "type": "number",
+            "description": "Current stock level. Denormalized from stock_movements; always fresh. Zero when inventory is disabled at the org or when tracking has never been enabled for this item.",
+            "examples": [
+              12
+            ]
+          },
+          "reorder_point": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Low-stock threshold. When quantity_on_hand drops to or below this value, the item appears in the /inventory low-stock banner. Null = no threshold set = never surfaced as low.",
+            "examples": [
+              3
+            ]
+          },
+          "weighted_avg_cost": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Running weighted-average cost basis, recomputed on each PO receive. Null until the first receive or until the org toggles inventory on with a seeded unit_cost. Used to snapshot COGS at consume time.",
+            "examples": [
+              45.5
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
