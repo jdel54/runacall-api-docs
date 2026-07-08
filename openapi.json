@@ -3211,8 +3211,35 @@
           "type": {
             "type": "string",
             "examples": [
-              "ac"
-            ]
+              "ac",
+              "walk_in_cooler"
+            ],
+            "description": "Equipment type key. Canonical HVAC keys always available: furnace, ac, heat_pump, boiler, mini_split, water_heater, thermostat, iaq, other. Additionally accepts any per-org custom label defined in the org's equipment types registry (migration 314). Free text, 1-64 chars."
+          },
+          "system_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Optional grouping layer added in migration 314. Points at an `equipment_systems.id` (e.g. 'Cooler A'). Null = ungrouped."
+          },
+          "asset_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "EVAP-A-12"
+            ],
+            "description": "Customer-facing unit identifier (migration 314). Case-insensitive unique per property. Distinct from `serial_number` and `external_id`."
+          },
+          "track_refrigerant": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Per-equipment refrigerant tab visibility (migration 314). Defaults from the canonical type's `uses_refrigerant` at create time when omitted; explicit override wins."
           },
           "manufacturer": {
             "type": [
@@ -3346,17 +3373,39 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "furnace",
+            "minLength": 1,
+            "maxLength": 64,
+            "examples": [
               "ac",
-              "heat_pump",
-              "boiler",
-              "mini_split",
-              "water_heater",
-              "thermostat",
-              "iaq",
-              "other"
-            ]
+              "walk_in_cooler"
+            ],
+            "description": "Equipment type key. Canonical HVAC keys always available: furnace, ac, heat_pump, boiler, mini_split, water_heater, thermostat, iaq, other. Any per-org custom label defined via /settings equipment types is also accepted (migration 314). Free text, 1-64 chars."
+          },
+          "system_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Optional grouping layer id (migration 314). Points at an `equipment_systems.id`. Must belong to the same property."
+          },
+          "asset_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 80,
+            "examples": [
+              "EVAP-A-12"
+            ],
+            "description": "Customer-facing unit identifier (migration 314). Case-insensitive unique per property. 23505 on duplicate."
+          },
+          "track_refrigerant": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Per-equipment refrigerant tracking (migration 314). When omitted at create time, server defaults from the canonical type's `uses_refrigerant`."
           },
           "manufacturer": {
             "type": [
@@ -3445,16 +3494,31 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": [
-              "furnace",
-              "ac",
-              "heat_pump",
-              "boiler",
-              "mini_split",
-              "water_heater",
-              "thermostat",
-              "iaq",
-              "other"
+            "minLength": 1,
+            "maxLength": 64,
+            "examples": [
+              "walk_in_cooler"
+            ],
+            "description": "Equipment type key. Canonical HVAC keys always available: furnace, ac, heat_pump, boiler, mini_split, water_heater, thermostat, iaq, other. Any per-org custom label defined via /settings equipment types is also accepted (migration 314). Free text, 1-64 chars."
+          },
+          "system_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "asset_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 80
+          },
+          "track_refrigerant": {
+            "type": [
+              "boolean",
+              "null"
             ]
           },
           "manufacturer": {
@@ -3535,6 +3599,194 @@
             ]
           }
         }
+      },
+      "EquipmentSystemList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentSystem"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "MjAyNi0wNS0wN1QwODo1OTowMi4xMjIzNDQrMDA6MDB8MzZhNTlmMDQ"
+            ],
+            "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
+          }
+        }
+      },
+      "EquipmentSystem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "property_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "examples": [
+              "Cooler A"
+            ]
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "COOL-A"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hvac",
+              "refrigeration",
+              "plumbing",
+              "electrical",
+              "other"
+            ],
+            "examples": [
+              "refrigeration"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "Store #12 primary walk-in — feeds evap A1..A6."
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EquipmentSystemDetail": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EquipmentSystem"
+          }
+        }
+      },
+      "EquipmentSystemWriteRequest": {
+        "type": "object",
+        "properties": {
+          "property_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Property UUID. Provide this OR `property_external_id` + `property_external_source`."
+          },
+          "property_external_id": {
+            "type": "string",
+            "examples": [
+              "crm-acme-001-prop1"
+            ]
+          },
+          "property_external_source": {
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "examples": [
+              "Cooler A"
+            ]
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40,
+            "examples": [
+              "COOL-A"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hvac",
+              "refrigeration",
+              "plumbing",
+              "electrical",
+              "other"
+            ],
+            "examples": [
+              "refrigeration"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "EquipmentSystemPatchRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hvac",
+              "refrigeration",
+              "plumbing",
+              "electrical",
+              "other"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          }
+        },
+        "description": "Partial update. At least one field must be present. Unknown keys return 422. Systems are property-scoped so `property_id` cannot be reassigned — soft-delete and re-create instead."
       },
       "JobList": {
         "type": "object",
@@ -6566,6 +6818,554 @@
           },
           "404": {
             "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipment-systems": {
+      "get": {
+        "tags": [
+          "Equipment Systems"
+        ],
+        "summary": "List equipment systems",
+        "description": "Systems are the optional grouping layer between property and equipment (e.g. 'Cooler A', 'Rooftop 3'). Equipment attaches to a system via `equipment.system_id`; the join is optional and a residential single-system home never has to create one.",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/equipment-systems \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment-systems\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Page size. Default 50, hard-capped at 100.",
+              "examples": [
+                "50"
+              ]
+            },
+            "required": false,
+            "description": "Page size. Default 50, hard-capped at 100.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a previous response's `next_cursor`."
+            },
+            "required": false,
+            "description": "Opaque cursor from a previous response's `next_cursor`.",
+            "name": "starting_after",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "property_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hvac",
+                "refrigeration",
+                "plumbing",
+                "electrical",
+                "other"
+              ]
+            },
+            "required": false,
+            "name": "category",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "created_after",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentSystemList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Equipment Systems"
+        ],
+        "summary": "Create an equipment system",
+        "description": "Provide `property_id` (UUID) OR `property_external_id` + `property_external_source`. System names are case-insensitive unique per property — 23505 is returned on duplicate.",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X POST https://api.runacall.com/v1/equipment-systems \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment-systems\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentSystemWriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — an existing row was updated. Returned when the supplied `external_id` + `external_source` matched an existing row (idempotent retry).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentSystemDetail"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created — a new row was inserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentSystemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipment-systems/{id}": {
+      "get": {
+        "tags": [
+          "Equipment Systems"
+        ],
+        "summary": "Get an equipment system",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/equipment-systems/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment-systems/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resource UUID."
+            },
+            "required": true,
+            "description": "Resource UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Single resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentSystemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Equipment Systems"
+        ],
+        "summary": "Update an equipment system",
+        "security": [
+          {
+            "bearerAuth": [
+              "write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl -X PATCH https://api.runacall.com/v1/equipment-systems/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '<see request body schema>'"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/equipment-systems/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  method: \"PATCH\",\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({ /* see request body schema */ }),\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resource UUID."
+            },
+            "required": true,
+            "description": "Resource UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentSystemPatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — row updated. Body returns the full updated resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentSystemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Concurrent INSERT race lost — another request with the same `external_id` + `external_source` won. Retry the same payload; the upsert will hit the existing row and return 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation failed (Zod). Common causes: missing required field, unknown field (.strict()), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.",
             "content": {
               "application/json": {
                 "schema": {
