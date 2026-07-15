@@ -3932,7 +3932,8 @@
               "membership_auto",
               "follow_up",
               "estimate_conversion",
-              "recurring"
+              "recurring",
+              "sales_visit"
             ]
           },
           "scheduled_date": {
