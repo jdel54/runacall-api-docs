@@ -799,6 +799,13 @@
               "non_member"
             ]
           },
+          "customer_notifications_enabled": {
+            "type": "boolean",
+            "description": "Migration 351: per-job \"Notify customer\" toggle. When `false`, scheduling notifications (schedule confirmation, day-before reminder, reschedule SMS) are suppressed for this job; day-of operational messages (on-my-way, arrival, completion, invoice, review request) still send. Read-only — managed in-app by the office. Defaults to `true`.",
+            "examples": [
+              true
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
