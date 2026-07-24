@@ -11113,6 +11113,7 @@
               "enum": [
                 "service",
                 "part",
+                "equipment",
                 "labor",
                 "bundle"
               ]
