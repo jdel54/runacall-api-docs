@@ -3322,15 +3322,64 @@
               "string",
               "null"
             ],
+            "description": "Legacy single data-plate photo URL, retained for back-compat. The full, unbounded set is in `photos` (migration 387).",
             "examples": [
               "https://storage.runacall.com/eq-photos/{org}/3618E12345.jpg"
             ]
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentPhoto"
+            },
+            "description": "All photos attached to this equipment (migration 387), ordered by sort_order then created_at. Additive field — empty array when none. Includes the data plate (also mirrored in data_plate_photo_url) plus before/after/damage/install/other shots captured in the office or by field techs."
           },
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EquipmentPhoto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photo_url": {
+            "type": "string",
+            "examples": [
+              "https://storage.runacall.com/equipment-photos/{org}/{equipment}/abc.jpg"
+            ]
+          },
+          "caption": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "Rusted contactor"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "Photo category: data_plate, before, after, damage, install, or other.",
+            "examples": [
+              "data_plate"
+            ]
+          },
+          "sort_order": {
+            "type": "integer",
+            "examples": [
+              0
+            ]
+          },
+          "created_at": {
             "type": "string",
             "format": "date-time"
           }
