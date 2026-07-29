@@ -2880,6 +2880,16 @@
             "type": "string",
             "format": "uuid"
           },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional human-given name for the property, used to tell apart several buildings at the same street address. Null when unnamed.",
+            "examples": [
+              "911 Center"
+            ]
+          },
           "address_line_1": {
             "type": "string",
             "examples": [
@@ -2946,6 +2956,16 @@
               -122.4192
             ]
           },
+          "photo_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Cover photo of the front of the building, uploaded by the shop. Null when none has been taken.",
+            "examples": [
+              "https://xyz.supabase.co/storage/v1/object/public/property-photos/org/prop/a1b2.jpg"
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -2994,6 +3014,17 @@
             "type": "string",
             "examples": [
               "servicetitan"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 120,
+            "description": "Optional human-given name to tell apart buildings at the same address.",
+            "examples": [
+              "911 Center"
             ]
           },
           "address_line_1": {
@@ -3088,6 +3119,16 @@
       "PropertyPatchRequest": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 120,
+            "examples": [
+              "911 Center"
+            ]
+          },
           "address_line_1": {
             "type": "string",
             "minLength": 1,
