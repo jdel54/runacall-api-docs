@@ -724,6 +724,16 @@
               "AC not cooling — possibly low refrigerant. Customer says it ran fine yesterday."
             ]
           },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Customer-supplied reference for the job — a PO / work-order / ticket number the customer issued. Distinct from the outbound Purchase Orders resource. Null when none.",
+            "examples": [
+              "PO-44821"
+            ]
+          },
           "diagnosis": {
             "type": [
               "string",
@@ -4068,6 +4078,17 @@
             "maxLength": 5000,
             "examples": [
               "AC not cooling — possibly low refrigerant."
+            ]
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "description": "Customer-supplied reference (PO / work-order / ticket number).",
+            "examples": [
+              "PO-44821"
             ]
           }
         },
