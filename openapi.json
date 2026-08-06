@@ -2053,10 +2053,9 @@
           },
           "autopay_enabled": {
             "type": "boolean",
-            "description": "Phase 21 (M1.f): true when the member has opted in to off-session Stripe Connect autopay AND a vaulted PaymentMethod is on file for the org's Connect account. Read-only on this surface — turning autopay on requires Stripe-side card tokenization done in the in-app settings flow, not via REST.",
+            "description": "Whether the membership is set up to be auto-charged on renewal against a saved customer card. **Currently always `false`** — Run a Call does not yet store customer cards, so membership renewals are collected manually from the emailed renewal invoice. Read-only on this surface; there is no API or in-app way to enable it today. The field is stable and will remain on the response — integrators can rely on it beginning to vary once saved-card autopay ships.",
             "examples": [
-              false,
-              true
+              false
             ]
           },
           "created_at": {
@@ -12538,7 +12537,7 @@
           "Webhooks"
         ],
         "summary": "membership.renewed",
-        "description": "A renewal invoice was paid and the membership rolled forward — `next_billing_date`, `next_maintenance_date`, and `end_date` advanced one billing cycle; `maintenance_jobs_created_count` reset to 0; `last_renewed_at` stamped to now. Fires from the manual mark-paid path today; Stripe Connect autopay flows through the same handler in a later phase. Idempotent — re-fires of the same `invoice.paid` event (e.g., Stripe webhook retries) do NOT double-emit.",
+        "description": "A renewal invoice was paid and the membership rolled forward — `next_billing_date`, `next_maintenance_date`, and `end_date` advanced one billing cycle; `maintenance_jobs_created_count` reset to 0; `last_renewed_at` stamped to now. Fires when the renewal invoice is marked paid — today that is always a manual collection, since Run a Call does not store customer cards. Auto-charged renewals, when they ship, will flow through this same handler and event. Idempotent — re-fires of the same `invoice.paid` event (e.g., Stripe webhook retries) do NOT double-emit.",
         "requestBody": {
           "required": true,
           "description": "Webhook event envelope POST'd to the subscriber URL.",
@@ -12572,7 +12571,7 @@
           "Webhooks"
         ],
         "summary": "membership.cancelled",
-        "description": "A customer membership was cancelled (UI action, REST PATCH to `status='cancelled'`, or Stripe Connect subscription deletion). All three paths emit.",
+        "description": "A customer membership was cancelled — from a UI action or a REST PATCH to `status='cancelled'`. Both paths emit.",
         "requestBody": {
           "required": true,
           "description": "Webhook event envelope POST'd to the subscriber URL.",
