@@ -3369,12 +3369,24 @@
               "string",
               "null"
             ],
+            "description": "Manufacturer parts coverage end date.",
             "examples": [
               "2028-06-15"
             ]
           },
+          "labor_warranty_expiry": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Contractor labor coverage end date (migration 457). Additive field — expires independently of `warranty_expiry`, and is null when never set.",
+            "examples": [
+              "2020-06-15"
+            ]
+          },
           "condition": {
             "type": "string",
+            "description": "One of new, good, fair, poor, critical. 'new' added in migration 456.",
             "examples": [
               "good"
             ]
@@ -3591,9 +3603,20 @@
               "2028-06-15"
             ]
           },
+          "labor_warranty_expiry": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Contractor labor coverage end date (migration 457).",
+            "examples": [
+              "2020-06-15"
+            ]
+          },
           "condition": {
             "type": "string",
             "enum": [
+              "new",
               "good",
               "fair",
               "poor",
@@ -3705,9 +3728,20 @@
               "2028-06-15"
             ]
           },
+          "labor_warranty_expiry": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Contractor labor coverage end date (migration 457).",
+            "examples": [
+              "2020-06-15"
+            ]
+          },
           "condition": {
             "type": "string",
             "enum": [
+              "new",
               "good",
               "fair",
               "poor",
