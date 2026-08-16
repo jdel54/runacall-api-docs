@@ -3,7 +3,7 @@
   "info": {
     "title": "Run a Call External API",
     "version": "1.0.0",
-    "description": "> A bearer-authenticated REST API for pushing data into and pulling data out of **[Run a Call](https://runacall.com)** — the field service platform built for small-to-mid HVAC companies. Migrate from your old CRM, sync with accounting tools, fire Zapier / Make / n8n flows on real-time events, or wire your own scripts. Same surface internally — no second-class endpoints.\n\n## ⚡ Quick start\n\nThree lines to your first request. Replace the token with one from **[Settings → Integrations → API](https://app.runacall.com/settings/integrations/api)** in your dashboard.\n\n```bash\ncurl https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\"\n```\n\nThat's it. Bearer header, JSON in, JSON out.\n\n---\n\n## 🔑 Authentication\n\nEvery request needs an `Authorization: Bearer rkc_live_...` header.\n\n| Scope | Grants |\n|---|---|\n| `read` | All `GET` endpoints |\n| `write` | `POST` and `PATCH` on customers / properties / equipment / jobs / memberships |\n\nTokens are **SHA-256 hashed at rest**. The raw value is shown to the org owner exactly once at creation — we cannot retrieve it later. Rotate at any time from the same settings page; the old token works for a 24-hour grace window so deploys don't break.\n\n---\n\n## 🛡️ Tenant isolation\n\nEvery request is scoped to the organization that owns the bearer token.\n\n- Cross-org reads return **404 (not 403)** to mask existence\n- No `admin` scope, no DELETE endpoints, no destructive verbs\n- Soft-delete (`is_deleted = true`) is a UI-only operation\n- RLS + service-role org-filter run independently — defense in depth\n\n---\n\n## 🚦 Rate limits\n\n| Layer | Limit | Window |\n|---|---|---|\n| Per key — sustained | 60 req | 1 min rolling |\n| Per key — burst | 120 req | 10 s rolling |\n| Per org — all keys combined | 300 req | 1 min rolling |\n| Concurrent in-flight per key | 5 | — |\n| Per-IP — unauthed paths | 10 req | 1 min rolling |\n\nExceeding any layer returns **`429 Too Many Requests`** with a `Retry-After` header. Founders can raise a known integrator's limit via per-key override — email **[admin@runacall.com](mailto:admin@runacall.com)**.\n\n---\n\n## 🔁 Idempotency — upsert by `external_id`\n\nEvery writable resource (customers, properties, equipment, jobs, memberships) accepts `external_id` + `external_source`. POSTing the same pair twice **upserts the existing row** — returns 200 with the same UUID instead of 201 with a duplicate.\n\n```bash\n# First call — creates\ncurl -X POST https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"external_id\":\"crm-acme-001\",\"external_source\":\"servicetitan\",\"first_name\":\"Jenny\",\"last_name\":\"Rosen\"}'\n# → 201 Created, id: 497f6eca-6276-4993-bfeb-53cbbbba6f08\n\n# Same call again — upserts, same id\ncurl -X POST https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"external_id\":\"crm-acme-001\",\"external_source\":\"servicetitan\",\"first_name\":\"Jenny\",\"last_name\":\"Rosen\"}'\n# → 200 OK, id: 497f6eca-6276-4993-bfeb-53cbbbba6f08\n```\n\nSafe to retry. Safe to script bulk imports against. Network blip? Re-fire — you'll never end up with duplicates.\n\n---\n\n## 📄 Pagination\n\nCursor-based, never offset. Pass back the `next_cursor` from a response as `?starting_after=<cursor>` to fetch the next page.\n\n```json\n{\n  \"data\": [ /* up to 100 items */ ],\n  \"has_more\": true,\n  \"next_cursor\": \"MjAyNi0wNS0wN1QwODo1OTowMi4xMjIzNDQrMDA6MDB8MzZhNTlmMDQ\"\n}\n```\n\nDefault page size 50, hard cap 100. There's no way to ask for \"all rows\" in a single call — keep your loop honest.\n\n---\n\n## ❌ Errors\n\nEvery error response is the same envelope:\n\n```json\n{\n  \"error\": {\n    \"code\": \"invalid_request\",\n    \"message\": \"external_id is required when upserting\",\n    \"doc_url\": \"https://docs.runacall.com/#errors-invalid_request\",\n    \"request_id\": \"req_a93a7817f5a8485d80204becea\"\n  }\n}\n```\n\nQuote **`request_id`** when reaching out for support — it correlates to our audit log.\n\n<a id=\"errors-invalid_request\"></a>\n### `invalid_request` — 400 / 422\n\nBody or query parameter validation failed. The `message` field names the specific issue. Common causes: missing required field, unknown field (`.strict()` rejects extras), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.\n\n<a id=\"errors-unauthorized\"></a>\n### `unauthorized` — 401\n\nMissing or invalid bearer token. Check the `Authorization` header format: `Bearer rkc_live_...`. If you rotated the token recently, the old value works for 24 hours — verify you're using the right one.\n\n<a id=\"errors-forbidden\"></a>\n### `forbidden` — 403\n\nYour token lacks the required scope. `POST` and `PATCH` endpoints require the `write` scope; everything else needs `read`. Issue a new key with the right scopes from the Settings page.\n\n<a id=\"errors-not_found\"></a>\n### `not_found` — 404\n\nThe resource doesn't exist, OR it belongs to another organization. We mask cross-org existence to prevent enumeration attacks — there's no way to tell from outside which case it is.\n\n<a id=\"errors-conflict\"></a>\n### `conflict` — 409\n\nConcurrent upsert race lost. Two POSTs hit the same `(external_id, external_source)` at once; only one won the unique-index race. **Retry the same payload** — your second attempt will hit the existing row via the upsert path and return 200.\n\n<a id=\"errors-rate_limited\"></a>\n### `rate_limited` — 429\n\nOne of the rate-limit layers above kicked in. The response includes a `Retry-After` header (seconds). Back off and retry.\n\n<a id=\"errors-internal_error\"></a>\n### `internal_error` — 500\n\nA bug on our end. Quote the `request_id` when emailing **admin@runacall.com** and we'll investigate. We log every 5xx response with full context.\n\n---\n\n## 🪝 Webhooks\n\nPush real-time events to your own endpoints instead of polling. Subscribe a URL via **[Settings → Integrations → Webhooks](https://app.runacall.com/settings/integrations/webhooks)**.\n\n**15 canonical events** across customers, jobs, estimates, invoices, payments, voice calls, and memberships. Every delivery is **HMAC-SHA256 signed** over `\\${ts}.\\${raw_body}` — header: `Run-A-Call-Signature: t=<unix>,v1=<hex>`. Verify the timestamp is within 5 minutes (replay protection), then verify the signature.\n\nFailed deliveries retry 3x with exponential backoff. After **10 consecutive failures** the subscription auto-pauses and we email the org owner — resume with one click.\n\nSee the **Webhooks** section in the sidebar for the full event catalog + payload shapes.\n\n---\n\n## 📦 What you can build\n\nA few patterns the API was designed for:\n\n- **One-shot migration from your old CRM** — script a pull from ServiceTitan / Housecall Pro / a spreadsheet → POST against `/customers` + `/properties` + `/equipment` with your own `external_id`. Re-run safely; idempotent.\n- **Accounting sync** — subscribe to `invoice.paid` + `payment.received` webhooks → push into QuickBooks / Xero / your ERP.\n- **Zapier / Make / n8n automation** — webhook triggers fan out to Slack, Notion, Google Sheets, anywhere.\n- **Custom analytics** — `GET /voice-calls/{id}` returns transcripts. No other HVAC platform exposes this.\n\nNeed an integration we haven't documented yet? Email **[admin@runacall.com](mailto:admin@runacall.com)** with what you're trying to do and we'll wire it.",
+    "description": "> A bearer-authenticated REST API for pushing data into and pulling data out of **[Run a Call](https://runacall.com)** — the field service platform built for small-to-mid HVAC companies. Migrate from your old CRM, sync with accounting tools, fire Zapier / Make / n8n flows on real-time events, or wire your own scripts. Same surface internally — no second-class endpoints.\n\n## ⚡ Quick start\n\nThree lines to your first request. Replace the token with one from **[Settings → Integrations → API](https://app.runacall.com/settings/integrations/api)** in your dashboard.\n\n```bash\ncurl https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\"\n```\n\nThat's it. Bearer header, JSON in, JSON out.\n\n---\n\n## 🔑 Authentication\n\nEvery request needs an `Authorization: Bearer rkc_live_...` header.\n\n| Scope | Grants |\n|---|---|\n| `read` | All `GET` endpoints |\n| `write` | `POST` and `PATCH` on customers / properties / equipment / jobs / memberships |\n\nTokens are **SHA-256 hashed at rest**. The raw value is shown to the org owner exactly once at creation — we cannot retrieve it later. Rotate at any time from the same settings page; the old token works for a 24-hour grace window so deploys don't break.\n\n---\n\n## 🛡️ Tenant isolation\n\nEvery request is scoped to the organization that owns the bearer token.\n\n- Cross-org reads return **404 (not 403)** to mask existence\n- No `admin` scope, no DELETE endpoints, no destructive verbs\n- Soft-delete (`is_deleted = true`) is a UI-only operation\n- RLS + service-role org-filter run independently — defense in depth\n\n---\n\n## 🚦 Rate limits\n\n| Layer | Limit | Window |\n|---|---|---|\n| Per key — sustained | 60 req | 1 min rolling |\n| Per key — burst | 120 req | 10 s rolling |\n| Per org — all keys combined | 300 req | 1 min rolling |\n| Concurrent in-flight per key | 5 | — |\n| Per-IP — unauthed paths | 10 req | 1 min rolling |\n\nExceeding any layer returns **`429 Too Many Requests`** with a `Retry-After` header. Founders can raise a known integrator's limit via per-key override — email **[admin@runacall.com](mailto:admin@runacall.com)**.\n\n---\n\n## 🔁 Idempotency — upsert by `external_id`\n\nEvery writable resource (customers, properties, equipment, jobs, memberships) accepts `external_id` + `external_source`. POSTing the same pair twice **upserts the existing row** — returns 200 with the same UUID instead of 201 with a duplicate.\n\n```bash\n# First call — creates\ncurl -X POST https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"external_id\":\"crm-acme-001\",\"external_source\":\"servicetitan\",\"first_name\":\"Jenny\",\"last_name\":\"Rosen\"}'\n# → 201 Created, id: 497f6eca-6276-4993-bfeb-53cbbbba6f08\n\n# Same call again — upserts, same id\ncurl -X POST https://api.runacall.com/v1/customers \\\n  -H \"Authorization: Bearer rkc_live_...\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"external_id\":\"crm-acme-001\",\"external_source\":\"servicetitan\",\"first_name\":\"Jenny\",\"last_name\":\"Rosen\"}'\n# → 200 OK, id: 497f6eca-6276-4993-bfeb-53cbbbba6f08\n```\n\nSafe to retry. Safe to script bulk imports against. Network blip? Re-fire — you'll never end up with duplicates.\n\n---\n\n## 📄 Pagination\n\nCursor-based, never offset. Pass back the `next_cursor` from a response as `?starting_after=<cursor>` to fetch the next page.\n\n```json\n{\n  \"data\": [ /* up to 100 items */ ],\n  \"has_more\": true,\n  \"next_cursor\": \"MjAyNi0wNS0wN1QwODo1OTowMi4xMjIzNDQrMDA6MDB8MzZhNTlmMDQ\"\n}\n```\n\nDefault page size 50, hard cap 100. There's no way to ask for \"all rows\" in a single call — keep your loop honest.\n\n---\n\n## ❌ Errors\n\nEvery error response is the same envelope:\n\n```json\n{\n  \"error\": {\n    \"code\": \"invalid_request\",\n    \"message\": \"external_id is required when upserting\",\n    \"doc_url\": \"https://docs.runacall.com/#errors-invalid_request\",\n    \"request_id\": \"req_a93a7817f5a8485d80204becea\"\n  }\n}\n```\n\nQuote **`request_id`** when reaching out for support — it correlates to our audit log.\n\n<a id=\"errors-invalid_request\"></a>\n### `invalid_request` — 400 / 422\n\nBody or query parameter validation failed. The `message` field names the specific issue. Common causes: missing required field, unknown field (`.strict()` rejects extras), `external_id` without `external_source`, FK reference not found in this organization, invalid job status transition.\n\n<a id=\"errors-unauthorized\"></a>\n### `unauthorized` — 401\n\nMissing or invalid bearer token. Check the `Authorization` header format: `Bearer rkc_live_...`. If you rotated the token recently, the old value works for 24 hours — verify you're using the right one.\n\n<a id=\"errors-forbidden\"></a>\n### `forbidden` — 403\n\nYour token lacks the required scope. `POST` and `PATCH` endpoints require the `write` scope; everything else needs `read`. Issue a new key with the right scopes from the Settings page.\n\n<a id=\"errors-not_found\"></a>\n### `not_found` — 404\n\nThe resource doesn't exist, OR it belongs to another organization. We mask cross-org existence to prevent enumeration attacks — there's no way to tell from outside which case it is.\n\n<a id=\"errors-conflict\"></a>\n### `conflict` — 409\n\nConcurrent upsert race lost. Two POSTs hit the same `(external_id, external_source)` at once; only one won the unique-index race. **Retry the same payload** — your second attempt will hit the existing row via the upsert path and return 200.\n\n<a id=\"errors-gone\"></a>\n### `gone` — 410\n\nThe customer was merged into another record by the business. The envelope carries `merged_into` — the surviving customer id. Re-key your cached copy and retry against `/customers/{merged_into}`. Also emitted as the `customer.merged` webhook event at merge time.\n\n<a id=\"errors-rate_limited\"></a>\n### `rate_limited` — 429\n\nOne of the rate-limit layers above kicked in. The response includes a `Retry-After` header (seconds). Back off and retry.\n\n<a id=\"errors-internal_error\"></a>\n### `internal_error` — 500\n\nA bug on our end. Quote the `request_id` when emailing **admin@runacall.com** and we'll investigate. We log every 5xx response with full context.\n\n---\n\n## 🪝 Webhooks\n\nPush real-time events to your own endpoints instead of polling. Subscribe a URL via **[Settings → Integrations → Webhooks](https://app.runacall.com/settings/integrations/webhooks)**.\n\n**15 canonical events** across customers, jobs, estimates, invoices, payments, voice calls, and memberships. Every delivery is **HMAC-SHA256 signed** over `\\${ts}.\\${raw_body}` — header: `Run-A-Call-Signature: t=<unix>,v1=<hex>`. Verify the timestamp is within 5 minutes (replay protection), then verify the signature.\n\nFailed deliveries retry 3x with exponential backoff. After **10 consecutive failures** the subscription auto-pauses and we email the org owner — resume with one click.\n\nSee the **Webhooks** section in the sidebar for the full event catalog + payload shapes.\n\n---\n\n## 📦 What you can build\n\nA few patterns the API was designed for:\n\n- **One-shot migration from your old CRM** — script a pull from ServiceTitan / Housecall Pro / a spreadsheet → POST against `/customers` + `/properties` + `/equipment` with your own `external_id`. Re-run safely; idempotent.\n- **Accounting sync** — subscribe to `invoice.paid` + `payment.received` webhooks → push into QuickBooks / Xero / your ERP.\n- **Zapier / Make / n8n automation** — webhook triggers fan out to Slack, Notion, Google Sheets, anywhere.\n- **Custom analytics** — `GET /voice-calls/{id}` returns transcripts. No other HVAC platform exposes this.\n\nNeed an integration we haven't documented yet? Email **[admin@runacall.com](mailto:admin@runacall.com)** with what you're trying to do and we'll wire it.",
     "contact": {
       "name": "Run a Call Support",
       "email": "admin@runacall.com"
@@ -397,6 +397,85 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "CustomerMergedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "customer.merged"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CustomerMergedData"
+          }
+        }
+      },
+      "CustomerMergedData": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": [
+              "customer_merge"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The surviving customer id (same as winner_id)."
+          },
+          "winner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "loser_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Now soft-deleted. GET /customers/{loser_id} returns 410 with `merged_into`."
+          },
+          "merged_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "moved": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource": {
+                  "type": "string",
+                  "examples": [
+                    "jobs",
+                    "invoices",
+                    "estimates",
+                    "properties"
+                  ]
+                },
+                "count": {
+                  "type": "integer"
+                }
+              }
+            },
+            "description": "Per-table count of rows repointed from the loser to the winner."
           }
         }
       },
@@ -2503,10 +2582,16 @@
                   "not_found",
                   "method_not_allowed",
                   "conflict",
+                  "gone",
                   "unsupported_media_type",
                   "rate_limited",
                   "internal_error"
                 ]
+              },
+              "merged_into": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Only on `gone` (410) for a merged customer: the id the record now lives under. Re-key and retry with this id."
               },
               "message": {
                 "type": "string",
@@ -5421,6 +5506,16 @@
           },
           "404": {
             "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "The customer was merged into another record. `error.merged_into` is the surviving customer id — re-key and retry with it. Also announced by the `customer.merged` webhook.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12137,6 +12232,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CustomerTaggedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "customer.merged": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "customer.merged",
+        "description": "Two customer records were merged by a user. `winner_id` survives; `loser_id` is soft-deleted and every job, invoice, estimate, property, membership and message it owned now belongs to the winner (`moved` lists the counts). Re-key any cached copy of `loser_id` to `winner_id` — `GET /customers/{loser_id}` returns `410 gone` with `merged_into` from now on. A `customer.updated` for the winner fires alongside.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerMergedEnvelope"
               }
             }
           }
