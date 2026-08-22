@@ -1648,6 +1648,26 @@
               "pi_3OqK4nJ8ZcU2bC0a1Y2eX3f"
             ]
           },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free-text payment reference — the check number for `check`, or a trace/confirmation number for `ach`/`zelle`/`wire`. Pushed to QuickBooks as the payment's `PaymentRefNum`. Null for Stripe-collected payments.",
+            "examples": [
+              "4417"
+            ]
+          },
+          "payer_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Who actually paid, when that differs from the invoice customer — a parent company, tenant, or warranty provider. Free text.",
+            "examples": [
+              "Johnson Controls Inc."
+            ]
+          },
           "collected_at": {
             "type": "string",
             "format": "date-time"
