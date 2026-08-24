@@ -1668,6 +1668,14 @@
               "Johnson Controls Inc."
             ]
           },
+          "batch_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Set when this payment is one allocation of a single larger payment - several payments sharing a `batch_id` were one cheque covering multiple invoices. Null for ordinary one-invoice payments."
+          },
           "collected_at": {
             "type": "string",
             "format": "date-time"
@@ -3496,6 +3504,16 @@
               "good"
             ]
           },
+          "filter_size": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Air filter size, free text (migration 492). Additive field — null when never set.",
+            "examples": [
+              "16x25x1"
+            ]
+          },
           "notes": {
             "type": [
               "string",
@@ -3728,6 +3746,18 @@
               "critical"
             ]
           },
+          "filter_size": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 40,
+            "description": "Air filter size, free text (migration 492).",
+            "examples": [
+              "16x25x1"
+            ]
+          },
           "notes": {
             "type": [
               "string",
@@ -3851,6 +3881,18 @@
               "fair",
               "poor",
               "critical"
+            ]
+          },
+          "filter_size": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 40,
+            "description": "Air filter size, free text (migration 492).",
+            "examples": [
+              "16x25x1"
             ]
           },
           "notes": {
