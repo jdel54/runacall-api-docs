@@ -2152,7 +2152,7 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 100,
-            "description": "M5.a: number of equipment units this membership covers. Default 1 (matches pre-M5.a flat-pricing semantics). When the linked plan has `price_per_unit` configured, the MRR is per-unit: `price_per_unit + (units - 1) × price_each_additional`, capped at the plan's `max_units`. Otherwise the membership's flat plan price applies regardless of units.",
+            "description": "M5.a: number of equipment units this membership covers. Default 1 (matches pre-M5.a flat-pricing semantics). When the linked plan has `price_per_unit` configured, billing is per-unit: `price_per_unit + (units - 1) × price_each_additional`, capped at the plan's `max_units`, in the period the plan's per-unit amounts are entered in (per month, or per year when the plan's `price_per_unit_basis` is `annual` — then the monthly revenue contribution is that total ÷ 12). Otherwise the membership's flat plan price applies regardless of units.",
             "examples": [
               1,
               2
