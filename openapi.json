@@ -4651,7 +4651,8 @@
             ],
             "examples": [
               "2026-09-15"
-            ]
+            ],
+            "description": "YYYY-MM-DD. The next covered tune-up. Omitted on create ⇒ computed as start_date + floor(365 / visits_per_year) days. Omitted on an external-id update ⇒ unchanged. Explicit null ⇒ no tune-up scheduled. Completing a covered tune-up in Run a Call advances this date by the plan interval on the membership's own cadence."
           }
         },
         "required": [
@@ -12762,7 +12763,7 @@
           "Webhooks"
         ],
         "summary": "membership.renewed",
-        "description": "A renewal invoice was paid and the membership rolled forward — `next_billing_date`, `next_maintenance_date`, and `end_date` advanced one billing cycle; `maintenance_jobs_created_count` reset to 0; `last_renewed_at` stamped to now. Fires when the renewal invoice is marked paid — today that is always a manual collection, since Run a Call does not store customer cards. Auto-charged renewals, when they ship, will flow through this same handler and event. Idempotent — re-fires of the same `invoice.paid` event (e.g., Stripe webhook retries) do NOT double-emit.",
+        "description": "A renewal invoice was paid and the membership rolled forward — `next_billing_date` and `end_date` advanced one billing cycle; `next_maintenance_date` is kept as-is (it follows the tune-up cadence and advances when a covered tune-up is completed; a stale date is stepped forward on that same cadence, and a missing one is computed from the billing date); `maintenance_jobs_created_count` resets to 0 only when the renewal crosses into a new plan-year; `last_renewed_at` stamped to now. Fires when the renewal invoice is marked paid — today that is always a manual collection, since Run a Call does not store customer cards. Auto-charged renewals, when they ship, will flow through this same handler and event. Idempotent — re-fires of the same `invoice.paid` event (e.g., Stripe webhook retries) do NOT double-emit.",
         "requestBody": {
           "required": true,
           "description": "Webhook event envelope POST'd to the subscriber URL.",
