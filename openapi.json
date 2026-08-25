@@ -3449,7 +3449,7 @@
               "boolean",
               "null"
             ],
-            "description": "Per-equipment refrigerant tab visibility (migration 314). Defaults from the canonical type's `uses_refrigerant` at create time when omitted; explicit override wins."
+            "description": "Per-equipment refrigerant tab visibility (migration 314). When omitted at create time, defaults from whichever registry owns the type — the canonical HVAC type's `uses_refrigerant`, or the org custom type's. Explicit override wins."
           },
           "manufacturer": {
             "type": [
@@ -3686,7 +3686,7 @@
               "boolean",
               "null"
             ],
-            "description": "Per-equipment refrigerant tracking (migration 314). When omitted at create time, server defaults from the canonical type's `uses_refrigerant`."
+            "description": "Per-equipment refrigerant tracking (migration 314). When omitted at create time, server defaults from the canonical HVAC type's `uses_refrigerant`, or from the org custom type's when the type is org-defined."
           },
           "manufacturer": {
             "type": [
