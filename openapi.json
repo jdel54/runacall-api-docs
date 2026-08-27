@@ -710,6 +710,16 @@
               "servicetitan"
             ]
           },
+          "job_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Human-readable sequential job number, unique within the organization. Format is `{prefix}-NNNN` where the prefix is the organization's configurable job prefix (default `JOB`) and the counter is zero-padded to at least 4 digits. Assigned by the platform when the job is created — read-only, and not accepted on create or update. Numbers are never reused, including for deleted jobs. Null only for jobs created before the numbering migration on an environment that has not yet backfilled.",
+            "examples": [
+              "JOB-0042"
+            ]
+          },
           "customer_id": {
             "type": "string",
             "format": "uuid"
