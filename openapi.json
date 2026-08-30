@@ -1524,6 +1524,21 @@
               3500
             ]
           },
+          "revised_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the invoice was last edited AFTER being sent to the customer (lines, amounts, wording, due date or contact). Null when it has never been revised. If `revised_at` is later than `sent_at`, the customer still holds an earlier version."
+          },
+          "revision_count": {
+            "type": "integer",
+            "description": "Number of post-send revisions. 0 = never edited after sending.",
+            "examples": [
+              0
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -1531,6 +1546,50 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "InvoiceUpdatedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "invoice.updated"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Invoice"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "invoice"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         }
       },
@@ -12587,6 +12646,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/InvoiceIssuedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "invoice.updated": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "invoice.updated",
+        "description": "An invoice the customer already holds was edited after sending — lines, amounts, wording, due date or contact. Fires once per editing burst (debounced ~90 s per invoice) after QuickBooks has been brought up to date; `revised_at` and `revision_count` on the payload identify the revision. Drafts never fire this (they fire `invoice.issued` when first sent).",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceUpdatedEnvelope"
               }
             }
           }
