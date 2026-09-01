@@ -4710,7 +4710,8 @@
               "monthly",
               "quarterly",
               "semi_annual",
-              "annual"
+              "annual",
+              "one_time"
             ]
           },
           "start_date": {
