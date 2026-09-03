@@ -1707,7 +1707,7 @@
           },
           "method": {
             "type": "string",
-            "description": "Payment method. One of: `credit_card` (online card via Stripe), `card` (card charged on-site), `ach`, `zelle`, `wire`, `check`, `cash`.",
+            "description": "Payment method. One of: `credit_card`, `ach`, `zelle`, `wire`, `check`, `cash`.",
             "examples": [
               "credit_card"
             ]
@@ -2239,7 +2239,7 @@
           },
           "autopay_enabled": {
             "type": "boolean",
-            "description": "Whether the membership is set up to be auto-charged on renewal against a saved customer card. **Currently always `false`** — Run a Call does not yet store customer cards, so membership renewals are collected manually from the emailed renewal invoice. Read-only on this surface; there is no API or in-app way to enable it today. The field is stable and will remain on the response — integrators can rely on it beginning to vary once saved-card autopay ships.",
+            "description": "Whether the membership is set up to be auto-charged on renewal against the customer's card on file. Turned on in-app when the office enrolls a customer who has a card on file (Customers → Cards on file → Add a card); there is no API way to change it. When true, the renewal invoice is charged off-session on the due date (the org's card fee applies) and a declined card surfaces in the office's Card failed worklist. Read-only on this surface.",
             "examples": [
               false
             ]
@@ -5287,7 +5287,6 @@
             "type": "string",
             "enum": [
               "credit_card",
-              "card",
               "ach",
               "zelle",
               "wire",
@@ -10875,10 +10874,7 @@
               "type": "string",
               "enum": [
                 "credit_card",
-                "card",
                 "ach",
-                "zelle",
-                "wire",
                 "check",
                 "cash"
               ]
