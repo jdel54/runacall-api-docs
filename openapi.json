@@ -649,7 +649,7 @@
               "null"
             ],
             "format": "date-time",
-            "description": "Optional per-tech window override. When null, falls back to the appointment-level scheduled_start."
+            "description": "A helper's own hours on this appointment, or null for the appointment's window. Only helpers carry hours; the Lead's pair is always null. A helper's window must sit inside the appointment window on the same day, and is cleared automatically when the appointment is retimed so it no longer fits."
           },
           "scheduled_end": {
             "type": [
@@ -4587,7 +4587,7 @@
               "string",
               "null"
             ],
-            "description": "Optional per-tech window override; falls back to the appointment-level window when null."
+            "description": "Helper-only hours inside the appointment window (send both start and end, or null for the whole appointment). Ignored for role='lead'. Out-of-window hours return 422."
           },
           "scheduled_end": {
             "type": [
@@ -4624,7 +4624,7 @@
             ]
           }
         },
-        "description": "Change a tech's role on an appointment or update their per-tech window override. Promoting to Lead auto-demotes the previous Lead. `tech_state` / clock fields are mobile-app-driven, not exposed for write."
+        "description": "Change a tech's role on an appointment or set a helper's own hours (both start and end inside the appointment window; null clears). Promoting to Lead auto-demotes the previous Lead and clears the promoted tech's hours — the Lead always works the appointment's window, so hours on a Lead return 422. `tech_state` / clock fields are mobile-app-driven, not exposed for write."
       },
       "MembershipList": {
         "type": "object",
