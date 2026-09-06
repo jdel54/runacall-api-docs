@@ -1707,7 +1707,7 @@
           },
           "method": {
             "type": "string",
-            "description": "Payment method. One of: `credit_card`, `ach`, `zelle`, `wire`, `check`, `cash`.",
+            "description": "Payment method. One of: `credit_card` (online card via Stripe), `card` (card charged on-site), `ach`, `zelle`, `wire`, `check`, `cash`.",
             "examples": [
               "credit_card"
             ]
@@ -5287,6 +5287,7 @@
             "type": "string",
             "enum": [
               "credit_card",
+              "card",
               "ach",
               "zelle",
               "wire",
@@ -10874,7 +10875,10 @@
               "type": "string",
               "enum": [
                 "credit_card",
+                "card",
                 "ach",
+                "zelle",
+                "wire",
                 "check",
                 "cash"
               ]
