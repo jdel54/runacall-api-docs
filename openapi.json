@@ -2261,6 +2261,30 @@
               false
             ]
           },
+          "covered_systems": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The equipment systems (see /v1/equipment-systems) this membership covers by name. Empty when the enrollment recorded a unit count only. Set at enrollment with `equipment_system_ids` on POST; edited in-app afterwards.",
+            "examples": [
+              [
+                {
+                  "id": "6f1c1c22-3b4a-4f0c-9c1e-3f4b2a1d5e77",
+                  "name": "Downstairs"
+                }
+              ]
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
