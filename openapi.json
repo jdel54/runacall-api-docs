@@ -1707,7 +1707,7 @@
           },
           "method": {
             "type": "string",
-            "description": "Payment method. One of: `credit_card` (online card via Stripe), `card` (card charged on-site), `ach`, `zelle`, `wire`, `check`, `cash`.",
+            "description": "Payment method kind. One of: `credit_card` (online card via Stripe), `card` (card charged on-site), `ach`, `zelle`, `wire`, `check`, `cash`, `financing` (third-party consumer financing). When `payment_method_id` is set this is that method's kind.",
             "examples": [
               "credit_card"
             ]
@@ -1754,6 +1754,24 @@
             ],
             "format": "uuid",
             "description": "Set when this payment is one allocation of a single larger payment - several payments sharing a `batch_id` were one cheque covering multiple invoices. Null for ordinary one-invoice payments."
+          },
+          "payment_method_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The organization-defined payment method this payment was recorded under (e.g. \"Podium Credit Card\"), when one was chosen. Null means the built-in `method`."
+          },
+          "payment_method_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Display name of `payment_method_id`. Null when no organization-defined method was chosen.",
+            "examples": [
+              "Podium Credit Card"
+            ]
           },
           "collected_at": {
             "type": "string",
@@ -5316,8 +5334,10 @@
               "zelle",
               "wire",
               "check",
-              "cash"
-            ]
+              "cash",
+              "financing"
+            ],
+            "description": "Payment method kind. When `payment_method_id` is given, the stored kind is that method's and this value is ignored."
           },
           "status": {
             "type": "string",
@@ -5339,6 +5359,30 @@
               "null"
             ],
             "maxLength": 200
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 21,
+            "description": "Check number or transfer confirmation. 21 characters max (QuickBooks PaymentRefNum)."
+          },
+          "payer_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "description": "Who paid, when that differs from the invoice customer."
+          },
+          "payment_method_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "An organization-defined payment method (as configured in Settings). Must belong to the organization and be active, else 422."
           }
         },
         "required": [
@@ -10904,7 +10948,8 @@
                 "zelle",
                 "wire",
                 "check",
-                "cash"
+                "cash",
+                "financing"
               ]
             },
             "required": false,
