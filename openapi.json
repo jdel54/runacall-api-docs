@@ -1707,13 +1707,14 @@
           },
           "method": {
             "type": "string",
-            "description": "Payment method kind. One of: `credit_card` (online card via Stripe), `card` (card charged on-site), `ach`, `zelle`, `wire`, `check`, `cash`, `financing` (third-party consumer financing). When `payment_method_id` is set this is that method's kind.",
+            "description": "Payment method kind. One of: `credit_card` (online card via Stripe, including Link and wallets), `card` (card charged on-site), `ach` (bank transfer, whether collected online through Stripe or recorded by hand), `zelle`, `wire`, `check`, `cash`, `financing` (third-party consumer financing). When `payment_method_id` is set this is that method's kind.",
             "examples": [
               "credit_card"
             ]
           },
           "status": {
             "type": "string",
+            "description": "One of `succeeded`, `pending`, `failed`, `refunded`. `pending` means an ACH bank transfer is in flight — Stripe has accepted it but it takes 4-5 business days to clear. A pending payment does NOT count toward the invoice balance and does not fire `payment.received`; it becomes `succeeded` when the transfer lands, or `failed` if the bank returns it.",
             "examples": [
               "succeeded"
             ]
