@@ -3653,6 +3653,16 @@
               "16x25x1"
             ]
           },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where the unit sits on the property, free text 1-80 chars (migration 566). Additive field — null when never set.",
+            "examples": [
+              "3rd floor"
+            ]
+          },
           "notes": {
             "type": [
               "string",
@@ -3897,6 +3907,18 @@
               "16x25x1"
             ]
           },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "Where the unit sits, e.g. \"3rd floor\" (migration 566).",
+            "examples": [
+              "3rd floor"
+            ]
+          },
           "notes": {
             "type": [
               "string",
@@ -4032,6 +4054,18 @@
             "description": "Air filter size, free text (migration 492).",
             "examples": [
               "16x25x1"
+            ]
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "Where the unit sits, e.g. \"3rd floor\" (migration 566).",
+            "examples": [
+              "3rd floor"
             ]
           },
           "notes": {
