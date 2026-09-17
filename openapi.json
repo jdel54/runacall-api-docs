@@ -2815,6 +2815,283 @@
           }
         }
       },
+      "BookingRequest_createdEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "booking.request_created"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebhookBookingRequest"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "booking_request"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "WebhookBookingRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "customer_phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "service_type": {
+            "type": "string"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "routine",
+              "urgent",
+              "emergency"
+            ]
+          },
+          "problem_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "address_line_1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "zip": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "declined",
+              "cancelled"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "requested_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "requested_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "confirmed_job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "handled_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "handled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "customer_email",
+          "service_type",
+          "urgency",
+          "problem_description",
+          "address_line_1",
+          "city",
+          "state",
+          "zip",
+          "status",
+          "source",
+          "requested_start",
+          "requested_end",
+          "confirmed_job_id",
+          "handled_by",
+          "handled_at",
+          "created_at"
+        ]
+      },
+      "BookingRequest_confirmedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "booking.request_confirmed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebhookBookingRequest"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "booking_request"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "BookingRequest_declinedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "booking.request_declined"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebhookBookingRequest"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "booking_request"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
       "CustomerList": {
         "type": "object",
         "properties": {
@@ -4520,7 +4797,8 @@
               "follow_up",
               "estimate_conversion",
               "recurring",
-              "sales_visit"
+              "sales_visit",
+              "google"
             ]
           },
           "scheduled_date": {
@@ -13437,6 +13715,108 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/AppointmentAssignments_changedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "booking.request_created": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "booking.request_created",
+        "description": "A customer submitted the public online booking form (booking page, iframe embed, or Google's Book Online button). Fires for every submission, including ones auto-confirmed into a job — the confirm event follows separately.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest_createdEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "booking.request_confirmed": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "booking.request_confirmed",
+        "description": "A booking request became a scheduled job — either instantly via the org's auto-confirm setting or by a dispatcher in the booking inbox. `confirmed_job_id` carries the job; `job.scheduled` fires alongside for it.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest_confirmedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "booking.request_declined": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "booking.request_declined",
+        "description": "A dispatcher declined a pending booking request from the inbox. The customer is texted to call instead (best-effort).",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest_declinedEnvelope"
               }
             }
           }
