@@ -12,6 +12,34 @@ during which clients should update.
 
 ---
 
+## 2026-09-22 — `ApiInvoice.notes` no longer carries an automatic line on extra-work invoices (value only)
+
+### What changed
+
+When a job is billed through a payment plan and the office raises a separate invoice for extra work, that invoice's `notes` used to start with a line the platform wrote by itself:
+
+```
+Additional work — billed outside the payment schedule
+```
+
+followed by whatever the office typed. That line is no longer written.
+
+- **Before:** `notes` = the automatic line, then the office's notes (or the automatic line alone).
+- **Now:** `notes` = the office's notes, or `null` when they typed nothing.
+
+The field, its type (`string | null`) and every other invoice field are unchanged. Invoices created before this date keep the text they already have.
+
+### Why
+
+`notes` prints on the customer's invoice. The line was internal bookkeeping wording that customers were reading.
+
+### Integrator action
+
+- If you match on that sentence to spot extra-work invoices: stop. Use `milestone_id` instead — a payment-plan invoice has one, an extra-work invoice on the same `job_id` has `milestone_id: null`.
+- Otherwise nothing to do.
+
+---
+
 ## 2026-09-21 — `POST /payments` against a $0 invoice no longer marks it `paid` (behavior correction)
 
 ### What changed
