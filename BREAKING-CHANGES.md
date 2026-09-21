@@ -12,9 +12,7 @@ during which clients should update.
 
 ---
 
-## 2026-09 — `POST /payments` against a $0 invoice no longer marks it `paid` (behavior correction)
-
-> Ships with hvac-product #1667. The date above is replaced with the release date when it lands.
+## 2026-09-21 — `POST /payments` against a $0 invoice no longer marks it `paid` (behavior correction)
 
 ### What changed
 
