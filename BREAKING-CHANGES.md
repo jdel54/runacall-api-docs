@@ -12,6 +12,38 @@ during which clients should update.
 
 ---
 
+## 2026-09 — `POST /payments` against a $0 invoice no longer marks it `paid` (behavior correction)
+
+> Ships with hvac-product #1667. The date above is replaced with the release date when it lands.
+
+### What changed
+
+`POST /api/v1/payments` derives the invoice's new status with the same rule the app itself uses. One edge moved:
+
+- **Before:** a payment of any amount posted against an invoice whose `total` is `0` set the invoice to `paid` (the check was `total_paid >= total`, which `0.01 >= 0` satisfies).
+- **Now:** an invoice is `paid` only when its `total` is greater than zero and the payments cover it. A payment posted against a $0 invoice records the payment and leaves the invoice `partial`.
+
+Nothing changes for invoices with a total above zero, which is every invoice that can actually be collected on. Request and response shapes are unchanged.
+
+### Why
+
+A $0 invoice (warranty visit, covered membership visit) has nothing to collect. Marking it `paid` off a stray payment made the API disagree with the app, which reported the same invoice as `partial`.
+
+### $0 invoices are now closed in the app, without a payment
+
+Offices can close a $0 invoice with **Close — no charge**. For integrators that means:
+
+- The invoice moves to `paid` with **no payment record** — `GET /payments?invoice_id=…` returns an empty list for it. Do not assume every `paid` invoice has at least one payment.
+- `invoice.paid` fires as usual. If the invoice was still a draft, `invoice.issued` fires first, so the order issued → paid always holds.
+- No `payment.*` event fires, because no money moved.
+
+### Integrator action
+
+- If you post payments against $0 invoices to close them: stop. Close them in the app, or leave them open.
+- If you reconcile `invoice.paid` against payments: treat `total = 0` as "paid, nothing collected".
+
+---
+
 ## 2026-05-24 — `POST /memberships/{id}/transfer` endpoint + `membership.transferred` event (additive)
 
 A new endpoint and a new canonical webhook event ship with Phase 27 M7.e — house-sale membership transfer.
