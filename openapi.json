@@ -1714,7 +1714,7 @@
           },
           "status": {
             "type": "string",
-            "description": "One of `succeeded`, `pending`, `failed`, `refunded`. `pending` means the money has not arrived yet: an ACH bank transfer in flight (Stripe has accepted it; 4-5 business days to clear), or a `financing` payment recorded in the field and awaiting the lender's funding, which the office confirms. A pending payment does NOT count toward the invoice balance and does not fire `payment.received`; it becomes `succeeded` when the transfer lands or the financing is marked funded, or `failed` if the bank returns it or the financing falls through. A `financing` payment is always created `pending`, whatever `status` is submitted.",
+            "description": "One of `succeeded`, `pending`, `failed`, `refunded`. `pending` means an ACH bank transfer is in flight — Stripe has accepted it but it takes 4-5 business days to clear. A pending payment does NOT count toward the invoice balance and does not fire `payment.received`; it becomes `succeeded` when the transfer lands, or `failed` if the bank returns it.",
             "examples": [
               "succeeded"
             ]
@@ -5462,16 +5462,6 @@
             "type": "number",
             "examples": [
               89
-            ]
-          },
-          "addon_price": {
-            "type": [
-              "number",
-              "null"
-            ],
-            "description": "Price used when the service is added to a job that already has another service. Flat-rate service prices have the trip charge baked in, so the second service sold on one visit is billed at this lower price instead. Null = no add-on price is set and `unit_price` always applies; null on every non-service item.",
-            "examples": [
-              49
             ]
           },
           "unit_cost": {
