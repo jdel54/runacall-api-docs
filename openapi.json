@@ -5464,6 +5464,16 @@
               89
             ]
           },
+          "addon_price": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Price used when the service is added to a job that already has another service. Flat-rate service prices have the trip charge baked in, so the second service sold on one visit is billed at this lower price instead. Null = no add-on price is set and `unit_price` always applies; null on every non-service item.",
+            "examples": [
+              49
+            ]
+          },
           "unit_cost": {
             "type": "number",
             "examples": [
