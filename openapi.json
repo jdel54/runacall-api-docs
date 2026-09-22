@@ -594,6 +594,18 @@
             ],
             "format": "date-time"
           },
+          "arrival_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "manual",
+              "auto_geofence",
+              null
+            ],
+            "description": "How actual_arrival was stamped: manual (the tech tapped Arrived) or auto_geofence (the field app's GPS dwell marked it). Null until arrived."
+          },
           "actual_complete": {
             "type": [
               "string",
@@ -796,6 +808,18 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "arrival_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "manual",
+              "auto_geofence",
+              null
+            ],
+            "description": "How actual_arrival was stamped: manual (the tech tapped Arrived) or auto_geofence (the field app's GPS dwell marked it). Null until arrived."
           },
           "actual_start": {
             "type": [
