@@ -606,6 +606,18 @@
             ],
             "description": "How actual_arrival was stamped: manual (the tech tapped Arrived) or auto_geofence (the field app's GPS dwell marked it). Null until arrived."
           },
+          "completion_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "manual",
+              "auto_geofence",
+              null
+            ],
+            "description": "How the visit was completed: manual (a tap or the office) or auto_geofence (auto-depart closed it after the company's grace period outside the fence). Null until completed, and for visits completed before this field existed."
+          },
           "actual_complete": {
             "type": [
               "string",
@@ -677,7 +689,8 @@
               "en_route",
               "on_site",
               "on_break",
-              "off_site"
+              "off_site",
+              "left_site"
             ],
             "description": "Independent per-tech state. Driven by the mobile app — not mutable via the External API in v1 (clock-in is a tech-on-device flow)."
           },
@@ -820,6 +833,18 @@
               null
             ],
             "description": "How actual_arrival was stamped: manual (the tech tapped Arrived) or auto_geofence (the field app's GPS dwell marked it). Null until arrived."
+          },
+          "completion_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "manual",
+              "auto_geofence",
+              null
+            ],
+            "description": "How the visit was completed: manual (a tap or the office) or auto_geofence (auto-depart closed it after the company's grace period outside the fence). Null until completed, and for visits completed before this field existed."
           },
           "actual_start": {
             "type": [
