@@ -846,6 +846,28 @@
             ],
             "description": "How the visit was completed: manual (a tap or the office) or auto_geofence (auto-depart closed it after the company's grace period outside the fence). Null until completed, and for visits completed before this field existed."
           },
+          "completion_outcome": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "quote_required",
+              "need_to_return",
+              null
+            ],
+            "description": "How a completed visit ended beyond \"done\": quote_required (the tech asked the office to build a quote) or need_to_return (another visit is needed). Null for a plain completion. The job's status is still `completed`; this is a label on top. Cleared when an estimate or follow-up is created from the job, when the job is reopened or cancelled, or when the office dismisses it."
+          },
+          "completion_outcome_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The tech's note that goes with completion_outcome. Null when none.",
+            "examples": [
+              "Needs a new blower motor — 1/2 HP, 115V"
+            ]
+          },
           "actual_start": {
             "type": [
               "string",
@@ -13086,7 +13108,7 @@
           "Webhooks"
         ],
         "summary": "job.completed",
-        "description": "A job's status transitioned to `completed`. Always fires alongside `job.status_changed`.",
+        "description": "A job's status transitioned to `completed`. Always fires alongside `job.status_changed`. `completion_outcome` on the payload says whether the tech finished with `quote_required` or `need_to_return` (null for a plain completion).",
         "requestBody": {
           "required": true,
           "description": "Webhook event envelope POST'd to the subscriber URL.",
