@@ -1610,6 +1610,13 @@
               0
             ]
           },
+          "refunded_total": {
+            "type": "number",
+            "description": "Sum of succeeded refunds against this invoice's payments. A refund does NOT reopen the invoice — `status` and the paid math ignore it; this is what went back to the customer. See `GET /refunds?invoice_id=`.",
+            "examples": [
+              0
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -1778,7 +1785,7 @@
           },
           "method": {
             "type": "string",
-            "description": "Payment method kind. One of: `credit_card` (online card via Stripe, including Link and wallets), `card` (card charged on-site), `ach` (bank transfer, whether collected online through Stripe or recorded by hand), `zelle`, `wire`, `check`, `cash`, `financing` (third-party consumer financing). When `payment_method_id` is set this is that method's kind.",
+            "description": "Payment method kind. One of: `credit_card` (online card via Stripe, including Link and wallets), `card` (card charged on-site), `ach` (bank transfer, whether collected online through Stripe or recorded by hand), `zelle`, `wire`, `check`, `cash`, `financing` (third-party consumer financing), `credit_memo` (a customer credit applied to the invoice — no cash moved; see `credit_memo_id`). When `payment_method_id` is set this is that method's kind.",
             "examples": [
               "credit_card"
             ]
@@ -1845,6 +1852,101 @@
               "Podium Credit Card"
             ]
           },
+          "credit_memo_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Set on `method: \"credit_memo\"` rows: the credit memo whose balance was applied to the invoice (`GET /credit-memos/{id}`). Null on every real payment."
+          },
+          "refunded_amount": {
+            "type": "number",
+            "description": "Sum of succeeded refunds against this payment. The payment keeps its `amount` and `succeeded` status — a refund is its own record (`GET /refunds?payment_id=`), and `payment.refunded` fires when one succeeds.",
+            "examples": [
+              0
+            ]
+          },
+          "fee_amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Stripe's processing fee for this payment, in dollars. Null for payments not collected through Stripe, and null until the fee has been captured (usually seconds after the payment). This is what Stripe kept — not the online payment fee the payer was charged, which is not part of `amount`.",
+            "examples": [
+              3.28
+            ]
+          },
+          "net_amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "What Stripe deposits for this payment (what the payer was charged minus `fee_amount`), in dollars. Null for non-Stripe payments and until captured.",
+            "examples": [
+              103.72
+            ]
+          },
+          "card_brand": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Card brand Stripe reported — `visa`, `mastercard`, `amex`, `discover`, … — or the bank name for a bank payment. Null for non-Stripe payments.",
+            "examples": [
+              "visa"
+            ]
+          },
+          "card_last4": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Last four digits of the card or bank account. Null for non-Stripe payments.",
+            "examples": [
+              "4242"
+            ]
+          },
+          "stripe_payout_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Stripe payout (`po_…`) that carried this payment to the organization's bank, when known — open it in the Stripe dashboard. Null while the money is still in the Stripe balance and for non-Stripe payments.",
+            "examples": [
+              "po_1QxYzAbCdEfGhIjK"
+            ]
+          },
+          "payout_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Status of that payout: `pending`, `in_transit`, `paid`, `failed` or `canceled`. A failed or canceled payout returns the money to the Stripe balance to ride the next one. Null when `stripe_payout_id` is null.",
+            "examples": [
+              "paid"
+            ]
+          },
+          "payout_arrival_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Calendar day (`YYYY-MM-DD`) Stripe expects that payout at the bank. Null when `stripe_payout_id` is null.",
+            "examples": [
+              "2026-10-01"
+            ]
+          },
+          "available_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Calendar day (`YYYY-MM-DD`) the funds became available in the Stripe balance. Null for non-Stripe payments and until captured.",
+            "examples": [
+              "2026-09-30"
+            ]
+          },
           "collected_at": {
             "type": "string",
             "format": "date-time"
@@ -1863,6 +1965,491 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "PaymentRefundedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "payment.refunded"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Refund"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "refund"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Refund": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "refund_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Per-organization sequential number.",
+            "examples": [
+              "RF-0007"
+            ]
+          },
+          "payment_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The payment this refund reverses, in part or in full."
+          },
+          "invoice_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "examples": [
+              150
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "method": {
+            "type": "string",
+            "description": "The refunded payment's method kind (same values as `Payment.method`).",
+            "examples": [
+              "credit_card"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "duplicate",
+              "requested_by_customer",
+              "warranty",
+              "goodwill",
+              "overpayment",
+              "service_issue",
+              "other"
+            ],
+            "examples": [
+              "warranty"
+            ]
+          },
+          "reason_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "succeeded",
+              "failed",
+              "canceled"
+            ],
+            "description": "`succeeded` for cash / check / card refunds at once; an ACH (bank) refund is `pending` for several business days and becomes `succeeded` or `failed` when the bank answers. `failed` also covers a Stripe refund Stripe declined.",
+            "examples": [
+              "succeeded"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "app",
+              "stripe_dashboard",
+              "api"
+            ],
+            "description": "`app` = refunded from Run a Call; `stripe_dashboard` = made in the organization's Stripe dashboard and ingested from the Connect `charge.refunded` event.",
+            "examples": [
+              "app"
+            ]
+          },
+          "stripe_refund_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "re_3OqK4nJ8ZcU2bC0a1Y2eX3f"
+            ]
+          },
+          "stripe_charge_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stripe_failure_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "refunded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the money went back. Null while pending."
+          },
+          "refunded_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Profile id of the teammate who refunded; null for dashboard refunds."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Credit_memoIssuedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "credit_memo.issued"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditMemo"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "credit_memo"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "CreditMemo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "credit_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Per-organization sequential number.",
+            "examples": [
+              "CM-0007"
+            ]
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invoice_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The invoice the credit was issued against, when there is one. A goodwill credit has none."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Total credit, tax included.",
+            "examples": [
+              150
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
+            "examples": [
+              "USD"
+            ]
+          },
+          "taxable": {
+            "type": "boolean"
+          },
+          "tax_amount": {
+            "type": "number",
+            "examples": [
+              0
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "duplicate",
+              "requested_by_customer",
+              "warranty",
+              "goodwill",
+              "overpayment",
+              "service_issue",
+              "other"
+            ],
+            "examples": [
+              "goodwill"
+            ]
+          },
+          "reason_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "applied",
+              "void"
+            ],
+            "description": "`open` while credit remains, `applied` once fully used, `void` (only possible before any application).",
+            "examples": [
+              "open"
+            ]
+          },
+          "applied_amount": {
+            "type": "number",
+            "examples": [
+              0
+            ]
+          },
+          "remaining_amount": {
+            "type": "number",
+            "description": "`amount − applied_amount`; 0 when void.",
+            "examples": [
+              150
+            ]
+          },
+          "issued_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "issued_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "voided_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "voided_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Credit_memoAppliedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "credit_memo.applied"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditMemo"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "credit_memo"
+                    ]
+                  },
+                  "application": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "invoice_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "payment_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "amount": {
+                        "type": "number"
+                      },
+                      "applied_at": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Credit_memoVoidedEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable event id (e.g. evt_a93a7817f5a8485d80204becea). Dedupe across retries by this value.",
+            "examples": [
+              "evt_a93a7817f5a8485d80204becea"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "credit_memo.voided"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditMemo"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "enum": [
+                      "credit_memo"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         }
       },
@@ -5438,6 +6025,70 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/Payment"
+          }
+        }
+      },
+      "RefundList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Refund"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "MjAyNi0wNS0wN1QwODo1OTowMi4xMjIzNDQrMDA6MDB8MzZhNTlmMDQ"
+            ],
+            "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
+          }
+        }
+      },
+      "RefundDetail": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Refund"
+          }
+        }
+      },
+      "CreditMemoList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditMemo"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "MjAyNi0wNS0wN1QwODo1OTowMi4xMjIzNDQrMDA6MDB8MzZhNTlmMDQ"
+            ],
+            "description": "Opaque cursor. Pass back as `?starting_after=<cursor>` to fetch the next page."
+          }
+        }
+      },
+      "CreditMemoDetail": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CreditMemo"
           }
         }
       },
@@ -11448,7 +12099,8 @@
                 "wire",
                 "check",
                 "cash",
-                "financing"
+                "financing",
+                "credit_memo"
               ]
             },
             "required": false,
@@ -11722,6 +12374,617 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaymentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refunds": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "List refunds",
+        "description": "Every refund against a payment, newest first. A refund never reopens the invoice — the invoice keeps its status and `refunded_total` carries the sum. Read-only in this version.",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/refunds \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/refunds\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Page size. Default 50, hard-capped at 100.",
+              "examples": [
+                "50"
+              ]
+            },
+            "required": false,
+            "description": "Page size. Default 50, hard-capped at 100.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a previous response's `next_cursor`."
+            },
+            "required": false,
+            "description": "Opaque cursor from a previous response's `next_cursor`.",
+            "name": "starting_after",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "invoice_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "payment_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "customer_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "succeeded",
+                "failed",
+                "canceled"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "duplicate",
+                "requested_by_customer",
+                "warranty",
+                "goodwill",
+                "overpayment",
+                "service_issue",
+                "other"
+              ]
+            },
+            "required": false,
+            "name": "reason",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "app",
+                "stripe_dashboard",
+                "api"
+              ]
+            },
+            "required": false,
+            "name": "source",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "refunded_after",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refunds/{id}": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Get a refund",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/refunds/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/refunds/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resource UUID."
+            },
+            "required": true,
+            "description": "Resource UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Single resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credit-memos": {
+      "get": {
+        "tags": [
+          "Credit Memos"
+        ],
+        "summary": "List credit memos",
+        "description": "Customer credits, newest first. Applying a credit to an invoice records a `payments` row with `method: \"credit_memo\"` (no cash moved) and fires `credit_memo.applied`. Read-only in this version.",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/credit-memos \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/credit-memos\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Page size. Default 50, hard-capped at 100.",
+              "examples": [
+                "50"
+              ]
+            },
+            "required": false,
+            "description": "Page size. Default 50, hard-capped at 100.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a previous response's `next_cursor`."
+            },
+            "required": false,
+            "description": "Opaque cursor from a previous response's `next_cursor`.",
+            "name": "starting_after",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "customer_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "invoice_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "applied",
+                "void"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "duplicate",
+                "requested_by_customer",
+                "warranty",
+                "goodwill",
+                "overpayment",
+                "service_issue",
+                "other"
+              ]
+            },
+            "required": false,
+            "name": "reason",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "issued_after",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditMemoList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — query parameter validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found (or exists in another org — existence is masked).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Retry after the seconds in `Retry-After`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credit-memos/{id}": {
+      "get": {
+        "tags": [
+          "Credit Memos"
+        ],
+        "summary": "Get a credit memo",
+        "security": [
+          {
+            "bearerAuth": [
+              "read"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "shell",
+            "label": "cURL",
+            "source": "curl https://api.runacall.com/v1/credit-memos/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a \\\n  -H \"Authorization: Bearer rkc_live_...\""
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "const res = await fetch(\"https://api.runacall.com/v1/credit-memos/49f1efa6-9a3c-4287-8d12-2e8c79b3f50a\", {\n  headers: {\n    Authorization: `Bearer ${process.env.RUNACALL_API_KEY}`,\n  },\n});\nconst data = await res.json();"
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resource UUID."
+            },
+            "required": true,
+            "description": "Resource UUID.",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Single resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditMemoDetail"
                 }
               }
             }
@@ -13346,7 +14609,7 @@
           "Webhooks"
         ],
         "summary": "payment.received",
-        "description": "Any payment recorded against an invoice (cash, check, ACH, credit card, Stripe Connect). Fires before `invoice.paid` when the same payment closes the invoice.",
+        "description": "Any payment recorded against an invoice (cash, check, ACH, credit card, Stripe Connect, or a credit memo applied — `method: \"credit_memo\"`). Fires before `invoice.paid` when the same payment closes the invoice.",
         "requestBody": {
           "required": true,
           "description": "Webhook event envelope POST'd to the subscriber URL.",
@@ -13354,6 +14617,142 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PaymentReceivedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "payment.refunded": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "payment.refunded",
+        "description": "A refund against a payment SUCCEEDED — at once for cash, check and card refunds made in Run a Call; days later for an ACH (bank) refund, which is `pending` first; and for a refund made in the organization's Stripe dashboard once the Connect `charge.refunded` event is ingested (`source: \"stripe_dashboard\"`). The payload is the refund (`GET /refunds/{id}`), not the payment: the payment keeps its `amount` and `succeeded` status, and the invoice keeps its status with `refunded_total` updated. Does not fire for `failed` refunds.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRefundedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "credit_memo.issued": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "credit_memo.issued",
+        "description": "A customer credit was issued (`status: \"open\"`). Payload is the credit memo wire shape.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credit_memoIssuedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "credit_memo.applied": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "credit_memo.applied",
+        "description": "Part or all of a credit memo was applied to an invoice. A `payments` row with `method: \"credit_memo\"` was recorded for the amount (so `payment.received`, and `invoice.paid` when it closes the invoice, fire alongside); the payload carries the memo AFTER the application plus an `application` block with the invoice, the payment row and the amount.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credit_memoAppliedEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscriber acknowledged delivery."
+          },
+          "202": {
+            "description": "Subscriber accepted delivery for async processing."
+          },
+          "204": {
+            "description": "Subscriber acknowledged delivery (no body)."
+          },
+          "default": {
+            "description": "Anything other than 2xx triggers a retry (up to 3 attempts). After 10 consecutive terminal failures the subscription auto-pauses."
+          }
+        }
+      }
+    },
+    "credit_memo.voided": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "credit_memo.voided",
+        "description": "A credit memo was voided before any of it was applied (`status: \"void\"`, `voided_at` set, `remaining_amount: 0`). A memo with an application on it cannot be voided — the application is removed first, which restores the credit and leaves the memo `open`. Payload is the credit memo wire shape.",
+        "requestBody": {
+          "required": true,
+          "description": "Webhook event envelope POST'd to the subscriber URL.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credit_memoVoidedEnvelope"
               }
             }
           }
