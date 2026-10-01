@@ -4693,6 +4693,26 @@
               "16x25x1"
             ]
           },
+          "filter_change_interval_months": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Months between filter changes, 1-24 (migration 632). Additive field — null when the unit's filter is not on a schedule.",
+            "examples": [
+              3
+            ]
+          },
+          "filter_last_changed_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Date the filter was last changed, YYYY-MM-DD (migration 632). Additive field — null when never recorded; the schedule then counts from install_date.",
+            "examples": [
+              "2026-07-04"
+            ]
+          },
           "location": {
             "type": [
               "string",
@@ -4947,6 +4967,28 @@
               "16x25x1"
             ]
           },
+          "filter_change_interval_months": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 24,
+            "description": "Months between filter changes, 1-24 (migration 632). null turns reminders off for the unit.",
+            "examples": [
+              3
+            ]
+          },
+          "filter_last_changed_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Date the filter was last changed, YYYY-MM-DD (migration 632).",
+            "examples": [
+              "2026-07-04"
+            ]
+          },
           "location": {
             "type": [
               "string",
@@ -5094,6 +5136,28 @@
             "description": "Air filter size, free text (migration 492).",
             "examples": [
               "16x25x1"
+            ]
+          },
+          "filter_change_interval_months": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 24,
+            "description": "Months between filter changes, 1-24 (migration 632). null turns reminders off for the unit.",
+            "examples": [
+              3
+            ]
+          },
+          "filter_last_changed_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Date the filter was last changed, YYYY-MM-DD (migration 632).",
+            "examples": [
+              "2026-07-04"
             ]
           },
           "location": {
