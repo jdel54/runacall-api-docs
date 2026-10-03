@@ -873,7 +873,8 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date-time",
+            "description": "First on-site arrival across all visits of the job (the earliest on-site clock-in). Not reset when a tech returns for a later visit. Null until someone first arrives."
           },
           "actual_end": {
             "type": [
