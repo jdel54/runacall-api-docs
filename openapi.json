@@ -4289,6 +4289,13 @@
               "https://xyz.supabase.co/storage/v1/object/public/property-photos/org/prop/a1b2.jpg"
             ]
           },
+          "is_active": {
+            "type": "boolean",
+            "description": "False when the office has marked the address inactive. Inactive properties stay readable and keep their history.",
+            "examples": [
+              true
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -4531,6 +4538,13 @@
             "maximum": 180,
             "examples": [
               -122.4192
+            ]
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Set false to mark the address inactive (kept with its history, left out of the office's pickers for new work); true to make it active again.",
+            "examples": [
+              false
             ]
           }
         }
