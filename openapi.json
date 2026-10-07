@@ -6281,6 +6281,26 @@
               25
             ]
           },
+          "labor_hours": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Hours of labor folded into this flat-rate item's `unit_price`. The customer sees one line (the part with labor included) rather than a part line plus a labor line. Null when the item carries no labor.",
+            "examples": [
+              1.5
+            ]
+          },
+          "labor_rate": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The billable hourly rate the item's labor was priced at. Null means the shop's default labor rate at the time of pricing. Informational: `unit_price` is always the price charged.",
+            "examples": [
+              150
+            ]
+          },
           "currency": {
             "type": "string",
             "description": "ISO 4217 currency code. Hardcoded `USD` in V1.",
