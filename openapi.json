@@ -2926,6 +2926,14 @@
             "type": "string",
             "format": "uuid"
           },
+          "property_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The customer address (see /v1/properties) this agreement covers — one agreement per building for a commercial account or a landlord. `null` = the account as a whole. Set on POST with `property_id` or the `property_external_id` + `property_external_source` pair; when omitted on create it is filled with the customer's only address when they have exactly one. Tune-up jobs booked from the membership open on this address."
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -5890,6 +5898,26 @@
             "type": "string",
             "format": "uuid",
             "description": "Service agreement UUID. The service_agreements table does NOT carry external_id columns in V1 — UUID is the only supported reference."
+          },
+          "property_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The customer address this agreement covers (one of the customer's /v1/properties). Omitted on create ⇒ the customer's only address when they have exactly one, else null (the account as a whole). `null` on an external-id update clears it."
+          },
+          "property_external_id": {
+            "type": "string",
+            "examples": [
+              "crm-acme-loc-002"
+            ]
+          },
+          "property_external_source": {
+            "type": "string",
+            "examples": [
+              "servicetitan"
+            ]
           },
           "status": {
             "type": "string",
