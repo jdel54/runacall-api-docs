@@ -6446,8 +6446,12 @@
             "format": "uuid"
           },
           "customer_id": {
-            "type": "string",
-            "format": "uuid"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Customer the message belongs to. Null for outbound texts sent with no customer in scope — an automation `Send SMS` step addressed to a Custom phone number or to the job's assigned technician. Match those by `recipient`, `message_body` or the automation run instead."
           },
           "job_id": {
             "type": [
