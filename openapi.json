@@ -6376,6 +6376,26 @@
               45.5
             ]
           },
+          "quickbooks_class_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The QuickBooks class this item's invoice lines post under (QuickBooks Online Class Id, or the Desktop class ListID), ahead of the job type's class. Null = the line follows the job type's class mapping. Read-only on the API — set from the pricebook item editor. Only meaningful for orgs whose QuickBooks company tracks classes.",
+            "examples": [
+              "5000000000000012345"
+            ]
+          },
+          "quickbooks_class_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Display name of `quickbooks_class_id` as last seen in QuickBooks (sub-classes are fully qualified, e.g. `HVAC:Service`). A cache, refreshed when the class list is reloaded in Settings; always null when `quickbooks_class_id` is null.",
+            "examples": [
+              "Service"
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -6426,8 +6446,12 @@
             "format": "uuid"
           },
           "customer_id": {
-            "type": "string",
-            "format": "uuid"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Customer the message belongs to. Null for outbound texts sent with no customer in scope — an automation `Send SMS` step addressed to a Custom phone number or to the job's assigned technician. Match those by `recipient`, `message_body` or the automation run instead."
           },
           "job_id": {
             "type": [
