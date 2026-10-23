@@ -124,6 +124,85 @@
           }
         }
       },
+      "CustomerAttribution": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "utm_source, else the ad network of a click id (gclid → google, msclkid → bing, fbclid → facebook), else the referring site (google, facebook, a host name), else \"direct\".",
+            "examples": [
+              "google"
+            ]
+          },
+          "medium": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "utm_medium, else cpc / paid_social for ad clicks, organic / social / referral for referrers.",
+            "examples": [
+              "cpc"
+            ]
+          },
+          "campaign": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "utm_campaign.",
+            "examples": [
+              "fall-tuneup"
+            ]
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "utm_term — the search keyword.",
+            "examples": [
+              "ac repair"
+            ]
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "utm_content.",
+            "examples": [
+              "headline-b"
+            ]
+          },
+          "landing_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The page they landed on (only the tracking parameters are kept in its query string).",
+            "examples": [
+              "https://example-hvac.com/ac-repair?utm_source=google&utm_medium=cpc"
+            ]
+          },
+          "referrer": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The referring site, origin + path.",
+            "examples": [
+              "https://www.google.com/"
+            ]
+          }
+        },
+        "description": "Where the customer first came from on the company's website, recorded by the website tracking script and carried onto the text, booking request or call they sent. Null when the customer has no website visit. Returned by the /customers endpoints. May be null in webhook payloads: events emitted by a /v1 request carry it, events from inside the app carry null."
+      },
       "Customer": {
         "type": "object",
         "properties": {
@@ -267,6 +346,17 @@
               false
             ]
           },
+          "assigned_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Owner (team member profile id) — the person responsible for this lead/contact. Null when unowned. Writable on POST and PATCH; the id must belong to an active member of your organization.",
+            "examples": [
+              "8b3f2c1e-5d4a-4f6b-9c7d-2e1a0b9c8d7f"
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -274,6 +364,9 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "attribution": {
+            "$ref": "#/components/schemas/CustomerAttribution"
           }
         }
       },
@@ -983,6 +1076,57 @@
             "examples": [
               true
             ]
+          },
+          "work_authorization": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "signed_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When the customer signed, in real UTC."
+              },
+              "signer_name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The name the customer typed under the signature.",
+                "examples": [
+                  "Dana Whitfield"
+                ]
+              },
+              "total": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The parts and labor total (before tax) the customer saw and approved, in dollars.",
+                "examples": [
+                  489.5
+                ]
+              },
+              "signature_url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "URL of the signature image (PNG)."
+              },
+              "text": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The authorization wording the customer read when they signed, with the company name filled in. `null` on signatures captured before this field existed.",
+                "examples": [
+                  "I authorize Acme Heating & Air to do the work described above at the price shown. If the scope changes, the new price will be agreed before any extra work is done."
+                ]
+              }
+            },
+            "description": "The customer's signature authorizing the work BEFORE it started, captured on the technician's phone when the company has \"Ask for the customer's signature before work starts\" turned on. Separate from the completion / payment signature. `null` when the job was never signed. If the customer signs again (for example after the scope changed), this holds the latest signature. Read-only."
           },
           "created_at": {
             "type": "string",
@@ -4006,6 +4150,17 @@
             "examples": [
               true
             ]
+          },
+          "assigned_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Owner (team member profile id). Must be an active member of your organization; null clears the owner.",
+            "examples": [
+              "8b3f2c1e-5d4a-4f6b-9c7d-2e1a0b9c8d7f"
+            ]
           }
         },
         "required": [
@@ -4153,6 +4308,17 @@
             "description": "When true, this customer's invoices and estimates skip sales tax.",
             "examples": [
               true
+            ]
+          },
+          "assigned_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Owner (team member profile id). Must be an active member of your organization; null clears the owner.",
+            "examples": [
+              "8b3f2c1e-5d4a-4f6b-9c7d-2e1a0b9c8d7f"
             ]
           }
         },
