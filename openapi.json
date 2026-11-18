@@ -6447,6 +6447,24 @@
               "1-hour HVAC system diagnostic. Includes written estimate."
             ]
           },
+          "part_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The number the supplier uses for this part, as the shop typed it. Free text and not unique: two suppliers can use the same number. Null when none is on file; normally only set on `part` and `equipment` items. Read-only on the API, set from the pricebook item editor or the CSV import.",
+            "examples": [
+              "P291-4554RS"
+            ]
+          },
+          "preferred_vendor_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The vendor this part is usually bought from. Null when none is set. Read-only on the API, set from the pricebook item editor or the CSV import."
+          },
           "type": {
             "type": "string",
             "examples": [
