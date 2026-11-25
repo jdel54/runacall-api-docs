@@ -6696,6 +6696,13 @@
               "SM3a8f7e6d5c4b3a2918e7f6d5c4b3a291"
             ]
           },
+          "marketing": {
+            "type": "boolean",
+            "description": "True for a marketing message: a campaign or automatic-send text or email, a test of one, or a reply received on the company's marketing number (for example a STOP). The list leaves these out unless `marketing=include` or `marketing=only` is passed.",
+            "examples": [
+              false
+            ]
+          },
           "sent_at": {
             "type": "string",
             "format": "date-time"
@@ -14039,6 +14046,21 @@
             },
             "required": false,
             "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "exclude",
+                "include",
+                "only"
+              ],
+              "description": "Marketing messages (campaign and automatic-send texts and emails, and replies received on the marketing number). `exclude` (the default) leaves them out, `include` returns them with everything else, `only` returns nothing else. Each communication says which it is in `marketing`."
+            },
+            "required": false,
+            "description": "Marketing messages (campaign and automatic-send texts and emails, and replies received on the marketing number). `exclude` (the default) leaves them out, `include` returns them with everything else, `only` returns nothing else. Each communication says which it is in `marketing`.",
+            "name": "marketing",
             "in": "query"
           },
           {
