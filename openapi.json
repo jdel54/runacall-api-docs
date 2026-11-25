@@ -3752,6 +3752,12 @@
           "source": {
             "type": "string"
           },
+          "heard_about": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "requested_start": {
             "type": [
               "string",
@@ -3807,6 +3813,7 @@
           "zip",
           "status",
           "source",
+          "heard_about",
           "requested_start",
           "requested_end",
           "confirmed_job_id",
