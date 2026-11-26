@@ -210,6 +210,16 @@
             "type": "string",
             "format": "uuid"
           },
+          "customer_number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Per-company sequential customer number, assigned by Run a Call. Read-only.",
+            "examples": [
+              1042
+            ]
+          },
           "external_id": {
             "type": [
               "string",
